@@ -21,6 +21,11 @@ const taskSchema = new mongoose.Schema(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
+    difficulityLevel: {
+      type:String,
+      enum:['easy','meddium','hard'],
+      default:'meddium'
+    },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // reference to the user collection
@@ -30,15 +35,19 @@ const taskSchema = new mongoose.Schema(
       ref: "User", // who created the task
       required: true,
     },
+    startedDate: {
+      type:Date
+    },
     dueDate: {
       type: Date,
-    },
+    },        //   add when it should be  started
     comments: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Comment", // optional, if you implement comments later
       },
     ],
+      //  how can identify the system  the user is active of not active
     isActive: {
       type: Boolean,
       default: true,

@@ -2,6 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import loginUseCase from '../../../core/use-case/login.usecase.js'
 import { userRepository } from "../../../infrastructure/repositories/user.repository.js";
 import { generateAccessToken,generateRefreshToken,verifyToken } from "../../../shared/utils/jwt.js";
+import bcrypt from 'bcrypt'
 
 const loginController = expressAsyncHandler( async(req,res)=>{
    
@@ -29,6 +30,11 @@ const loginController = expressAsyncHandler( async(req,res)=>{
     secure:process.env.NODE_ENV ==='production',
     maxAge:7*24*60*60*1000 
    })
+   //   hash  refresh token  
+   const hashedToken = await bcrypt.hash(refreshToken,10)
+     // save refresh token to the database 
+     await userRepository.saveRefreshToken(result._id,hashedToken)
+
 
   res.status(201).json({
     sucess:true,

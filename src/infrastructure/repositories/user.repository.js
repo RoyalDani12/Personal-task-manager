@@ -12,6 +12,13 @@ export const userRepository = {
 
   async createUser(data) {
     return await User.create(data);
+  },
+
+  async saveRefreshToken (userId,refreshToken) {
+    return await User.findByIdAndUpdate(userId,
+      { refreshToken },
+      { returnDocument:'after' }
+    )
   }
 
 };
