@@ -5,7 +5,7 @@ import { faGithub, faInstagram, faLinkedin, faTelegram } from '@fortawesome/free
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 mt-10">
+    <footer className="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 border border-t-black-400">
       <div className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8 items-start">
 
         {/* Links */}

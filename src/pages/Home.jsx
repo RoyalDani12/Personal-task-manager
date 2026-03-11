@@ -9,9 +9,6 @@ const Home = () => {
        <Navbar/>
        <Hero/>
        </div>
-       <div>
-        
-       </div>
        <Footer/>
     </div>
   )
