@@ -1,7 +1,7 @@
 
 const taskUseCase =async(taskRepository,createdBy,userData)=>{
 
-   const { title,description,status,priority} = userData
+   const { title,description,status,priority,dueDate } = userData
 
     if(!title){
       const error = new Error("Title is required")
@@ -13,7 +13,8 @@ const taskUseCase =async(taskRepository,createdBy,userData)=>{
       description,
       status,
       priority,
-      createdBy
+      createdBy,
+      dueDate
     })
 
     return createdTask

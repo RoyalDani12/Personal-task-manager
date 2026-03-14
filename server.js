@@ -12,7 +12,11 @@ import taskRoutes from '../server/src/modules/tasks/routes/task.route.js'
 
 //middleware 
 app.use(express.json())
-app.use(cors())
+const corsOption ={
+  origin:'http://localhost:5173',
+  credentials:true
+}
+app.use(cors(corsOption))
 // to read cookie
 app.use(cookieParser())
 app.use('/api/auth',authRoutes)

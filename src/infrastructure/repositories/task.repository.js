@@ -20,6 +20,10 @@ const taskRepository = {
       data,
       { returnDocument:"after" }
      )
+  },
+
+  async taskDetail(taskId,userId){
+     return await Task.findOne({_id:taskId,createdBy:userId})
   }
 
 }
