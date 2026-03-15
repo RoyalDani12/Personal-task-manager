@@ -1,82 +1,159 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGithub, faInstagram, faLinkedin, faTelegram } from '@fortawesome/free-brands-svg-icons';
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGithub, faInstagram, faLinkedin, faTelegram } from '@fortawesome/free-brands-svg-icons'
 
 const Footer = () => {
+
   return (
-    <footer className="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 border border-t-black-400">
-      <div className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8 items-start">
 
-        {/* Links */}
-        <div className="flex flex-col gap-2">
-          <h3 className="font-bold text-lg mb-2">Quick Links</h3>
-          <Link to="/login" className="hover:text-blue-500 transition">Login</Link>
-          <Link to="/register" className="hover:text-blue-500 transition">Register</Link>
-          <Link to="/tasks" className="hover:text-blue-500 transition">Tasks</Link>
-          <Link to="/profile" className="hover:text-blue-500 transition">Profile</Link>
+    <footer className="bg-slate-950 text-slate-300 border-t border-slate-800">
+
+      <div className="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-3 gap-10">
+
+        {/* Brand Section */}
+
+        <div className="space-y-4">
+
+          <h2 className="text-2xl font-bold text-white">
+            DaniRoyal
+          </h2>
+
+          <p className="text-sm text-slate-400 leading-relaxed">
+            A modern task management platform built with scalable backend and
+            clean UI. Designed for productivity, performance and real world
+            applications.
+          </p>
+
         </div>
 
-        {/* Hire the developer */}
-        <div className="flex flex-col gap-4 items-start">
-          <h3 className="font-bold text-lg">Hire the Developer</h3>
-          <p>If you like my work, let's collaborate!</p>
-          <a
-            href="mailto:daniray@example.com"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            Hire Me
-          </a>
-        </div>
 
-        {/* Social icons */}
-        <div className="flex flex-col gap-4">
-          <h3 className="font-bold text-lg mb-2">Follow Me</h3>
-          <div className="flex gap-4">
-            <a
-              href="https://www.linkedin.com/in/yourprofile"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-500 transition"
-            >
-              <FontAwesomeIcon icon={faLinkedin} size="2x" />
-            </a>
-            <a
-              href="https://t.me/yourtelegram"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-500 transition"
-            >
-              <FontAwesomeIcon icon={faTelegram} size="2x" />
-            </a>
-            <a
-              href="https://github.com/RoyalDani12"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-blue-500 transition"
-            >
-              <FontAwesomeIcon icon={faGithub} size="2x" />
-            </a>
-            <a
-              href="https://instagram.com/yourinstagram"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-pink-500 transition"
-            >
-              <FontAwesomeIcon icon={faInstagram} size="2x" />
-            </a>
+        {/* Quick Links */}
+
+        <div>
+
+          <h3 className="text-lg font-semibold text-white mb-4">
+            Quick Links
+          </h3>
+
+          <div className="flex flex-col gap-3 text-sm">
+
+            <Link to="/login" className="hover:text-indigo-400 transition">
+              Login
+            </Link>
+
+            <Link to="/register" className="hover:text-indigo-400 transition">
+              Register
+            </Link>
+
+            <Link to="/tasks" className="hover:text-indigo-400 transition">
+              Tasks
+            </Link>
+
+            <Link to="/profile" className="hover:text-indigo-400 transition">
+              Profile
+            </Link>
+
           </div>
+
+        </div>
+
+
+        {/* Hire + Social */}
+
+        <div className="space-y-6">
+
+          <div>
+
+            <h3 className="text-lg font-semibold text-white mb-2">
+              Work With Me
+            </h3>
+
+            <p className="text-sm text-slate-400 mb-4">
+              If you like my work, let's build something amazing together.
+            </p>
+
+            <a
+              href="mailto:daniray@example.com"
+              className="inline-block bg-indigo-600 hover:bg-indigo-500 transition px-6 py-2 rounded-lg text-white text-sm font-medium"
+            >
+              Hire Me
+            </a>
+
+          </div>
+
+
+          {/* Social Icons */}
+
+          <div>
+
+            <h3 className="text-lg font-semibold text-white mb-3">
+              Follow Me
+            </h3>
+
+            <div className="flex gap-4">
+
+              <a
+                href="https://www.linkedin.com/in/yourprofile"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-800 p-3 rounded-lg hover:bg-indigo-600 transition"
+              >
+                <FontAwesomeIcon icon={faLinkedin} />
+              </a>
+
+              <a
+                href="https://t.me/yourtelegram"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-800 p-3 rounded-lg hover:bg-indigo-600 transition"
+              >
+                <FontAwesomeIcon icon={faTelegram} />
+              </a>
+
+              <a
+                href="https://github.com/RoyalDani12"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-800 p-3 rounded-lg hover:bg-indigo-600 transition"
+              >
+                <FontAwesomeIcon icon={faGithub} />
+              </a>
+
+              <a
+                href="https://instagram.com/yourinstagram"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-800 p-3 rounded-lg hover:bg-pink-500 transition"
+              >
+                <FontAwesomeIcon icon={faInstagram} />
+              </a>
+
+            </div>
+
+          </div>
+
         </div>
 
       </div>
 
-      <hr className="border-gray-300 dark:border-gray-700" />
 
-      <div className="max-w-6xl mx-auto px-6 py-4 text-center text-sm text-gray-600 dark:text-gray-400">
-        &copy; {new Date().getFullYear()} DaniRoyal. All rights reserved.
+      {/* Bottom */}
+
+      <div className="border-t border-slate-800">
+
+        <div className="max-w-7xl mx-auto px-6 py-5 text-center text-sm text-slate-500">
+
+          © {new Date().getFullYear()} DaniRoyal. Built with React & Node.js.
+
+        </div>
+
       </div>
-    </footer>
-  );
-};
 
-export default Footer;
+    </footer>
+
+  )
+
+}
+
+export default Footer

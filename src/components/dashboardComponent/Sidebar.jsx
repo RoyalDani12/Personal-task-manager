@@ -10,35 +10,19 @@ import {
   faBars,
   faNoteSticky
 } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
-  {
-    icon: faGauge,
-    label: "Dashboard"
-  },
-  {
-    icon: faTasks,
-    label: "My Tasks"
-  },
-  {
-    icon: faFolder,
-    label: "Categories"
-  },
-  {
-    icon: faFlag,
-    label: "Priorities"
-  },
-  {
-    icon: faNoteSticky,
-    label: "Notes"
-  },
-  {
-    icon: faGear,
-    label: "Settings"
-  }
+  { icon: faGauge, label: "Dashboard" },
+  { icon: faTasks, label: "My Tasks" },
+  { icon: faFolder, label: "Categories" },
+  { icon: faFlag, label: "Priorities" },
+  { icon: faNoteSticky, label: "Notes" },
+  { icon: faGear, label: "Settings" }
 ];
 
-const Sidebar = ({ UserName }) => {
+const Sidebar = ({ UserName, userId, avatar }) => {
+  const navigate = useNavigate();
 
   return (
     <div className="
@@ -53,7 +37,6 @@ const Sidebar = ({ UserName }) => {
 
       {/* Top Section */}
       <div>
-
         {/* Logo */}
         <div className="
           flex
@@ -64,22 +47,17 @@ const Sidebar = ({ UserName }) => {
           border-b
           border-slate-800
         ">
-
           <h1 className="text-white text-xl font-semibold tracking-wide">
             TaskFlow
           </h1>
-
           <FontAwesomeIcon
             icon={faBars}
             className="text-slate-400 cursor-pointer hover:text-white transition"
           />
-
         </div>
-
 
         {/* Menu */}
         <ul className="mt-6 space-y-2 px-3">
-
           {menuItems.map((item, index) => (
             <li
               key={index}
@@ -99,20 +77,12 @@ const Sidebar = ({ UserName }) => {
                 hover:translate-x-1
               "
             >
-
               <FontAwesomeIcon icon={item.icon} />
-
-              <span className="text-sm font-medium">
-                {item.label}
-              </span>
-
+              <span className="text-sm font-medium">{item.label}</span>
             </li>
           ))}
-
         </ul>
-
       </div>
-
 
       {/* User Profile */}
       <div className="
@@ -123,26 +93,28 @@ const Sidebar = ({ UserName }) => {
         items-center
         gap-4
       ">
-
-        <div className="
-          w-10
-          h-10
-          rounded-full
-          bg-indigo-500
-          flex
-          items-center
-          justify-center
-          text-white
-        ">
-          <FontAwesomeIcon icon={faUser} />
+        {/* Avatar */}
+        <div
+          className="w-10 h-10 rounded-full overflow-hidden cursor-pointer"
+          onClick={() => navigate("/profile-page")}
+        >
+          {avatar ? (
+            <img
+              src={avatar.startsWith("/uploads") ? `http://localhost:5000${avatar}` : avatar}
+              alt="User Avatar"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-indigo-500 flex items-center justify-center text-white">
+              <FontAwesomeIcon icon={faUser} />
+            </div>
+          )}
         </div>
 
         <p className="text-slate-300 text-sm font-medium">
           {UserName?.toUpperCase()}
         </p>
-
       </div>
-
     </div>
   );
 };

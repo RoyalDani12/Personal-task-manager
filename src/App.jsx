@@ -7,6 +7,8 @@ import Dashboard from "./pages/Dashboard"
 import TaskDetail from "./components/dashboardComponent/TaskDetail"
 // import addTask from "./api/addTask"
 import AddTask from "./components/dashboardComponent/AddTask"
+import UpdateTask from "./components/dashboardComponent/UpdateTask"
+import ProfilePage from "./pages/profilePage"
 
 function App() {
 
@@ -19,8 +21,10 @@ function App() {
           <Route path="/register" element={<Register/>}></Route>
           <Route path="/login" element={<Login/>}></Route>
           <Route path="/dashboard" element={<Dashboard/>}></Route>
-          <Route path="/task-detail" element={<TaskDetail/>}></Route>
+          <Route path="/task-detail/:id" element={<TaskDetail/>}></Route>
           <Route path="/create-task" element={<AddTask/>}></Route>
+          <Route path="/update/:id" element={<UpdateTask/>}></Route>
+          <Route path="/profile-page" element={<ProfilePage/>}> </Route>
        </Routes>
       </BrowserRouter>
      </div>

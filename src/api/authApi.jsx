@@ -18,7 +18,8 @@ export const loginAPI =(data)=>{
   return axios.post(
    'http://localhost:5000/api/auth/login',data,{
     headers:{
-    "content-Type":"application/json"
-    }
+    "content-Type":"application/json",
+    },
+    // withCredentials:true
    })
 }

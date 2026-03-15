@@ -162,6 +162,13 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* Submit */}
+        <button onClick={()=>navigate('/dashboard')}
+          type="button"
+          className="mt-4 bg-indigo-700 hover:bg-indigo-500 p-3 rounded-full font-semibold flex items-center justify-center gap-2 shadow-lg transition"
+        >
+        
+          Cancel
+        </button>
         <button
           type="submit"
           className="mt-4 bg-indigo-600 hover:bg-indigo-500 p-3 rounded-full font-semibold flex items-center justify-center gap-2 shadow-lg transition"
@@ -169,6 +176,7 @@ const handleSubmit = async (e) => {
           <FontAwesomeIcon icon={faPlus} />
           Add Task
         </button>
+
       </form>
     </div>
   );

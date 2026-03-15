@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [userName, setUserName] = useState('');
+  const [user ,setUserData ] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -18,32 +19,50 @@ const Dashboard = () => {
     const userDataString = localStorage.getItem("user");
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      if (userData?.data.name) setUserName(userData.data.name);
+      if (userData?.data.name){
+         setUserName(userData.data.name);
+         setUserData(userData.data)
+        //  console.log("dani this is user id ",userId);
+         
+      }
     }
   }, []);
+
+//   useEffect(() => {
+//   if (user) {
+//     console.log("Verified User ID has updated:", user);
+//   }
+// }, [user]);
 
   const fetchTasks = async () => {
     const response = await getTask();
     setTasks(response?.data || []);
   };
 
-  const handleDelete = async (id) => {
+  // const handleDelete = async (id) => {
 
-    console.log("Deleting task:", id);
-  };
+  //   console.log("Deleting task:", id);
+  // };
 
 
 
-  const completed = tasks.filter((task) => task.status === "Completed").length;
-  const active = tasks.filter((task) => task.status === "Active").length;
-  const pending = tasks.filter((task) => task.status === "Pending").length;
+  const completed = tasks.filter((task) => task.status === "completed").length;
+  const active = tasks.filter((task) => task.status === "in-progress").length;
+  const pending = tasks.filter((task) => task.status === "pending").length;
 
   return (
     <div className=" bg-[#0f172a] flex h-screen overflow-hidden text-slate-200 font-sans">
-      <Sidebar UserName={userName} />
+        <Sidebar
+          UserName={user.name}
+          // userId={user._id}
+          avatar={user.avatar}
+        />
 
       <main className="flex-1 p-8 overflow-y-auto overflow-hidden h-full">
-        <Header UserName={userName} />
+        <Header 
+        UserName={userName}
+        // userId={user}
+         />
 
         <div className="flex justify-between items-center mt-10 mb-8">
           <div>
@@ -52,7 +71,7 @@ const Dashboard = () => {
           </div>
           <button
             onClick={()=> navigate('/create-task')}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl flex items-center gap-2 font-semibold shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+            className="bg-green-600 hover:bg-green-700 text-black px-6 py-3 rounded-3xl flex items-center gap-2 font-semibold shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
           >
             <FontAwesomeIcon icon={faPlus} />
             Add Task
@@ -81,8 +100,8 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
           {tasks.length > 0 ? (
             tasks.map((task) => (
-              <Link key={task._id} to={'/task-detail'} className="block h-full">
-                <TaskCard item={task} onDelete={handleDelete} />
+              <Link key={task._id} to={`/task-detail/${task._id}`} className="block h-full">
+                <TaskCard item={task}  />
               </Link>
             ))
           ) : (
