@@ -19,6 +19,20 @@ export const userRepository = {
       { refreshToken },
       { returnDocument:'after' }
     )
+  },
+  async findUserById (id){
+    return await User.findById(id)
+  },
+
+  async findUserAndUpdate (userId,data){
+    return await User.findByIdAndUpdate(
+      userId,
+      { $set:data }, // only update the filde provided in the data
+      {
+        returnDocument:"after", //  substitute new: true
+        runValidators:true
+      }
+    )
   }
 
 };

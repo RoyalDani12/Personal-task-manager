@@ -8,7 +8,12 @@ import connectDB from "./src/infrastructure/database/mongodb/connection.js"
 import authRoutes from '../server/src/modules/auth/auth.route.js'
 import cookieParser from "cookie-parser"
 import taskRoutes from '../server/src/modules/tasks/routes/task.route.js'
+import userRoutes from '../server/src/modules/users/user.route.js'
 
+import path from 'path'   
+
+
+app.use('/uploads',express.static(path.join(process.cwd(),'uploads')))
 
 //middleware 
 app.use(express.json())
@@ -21,6 +26,7 @@ app.use(cors(corsOption))
 app.use(cookieParser())
 app.use('/api/auth',authRoutes)
 app.use('/api/tasks',taskRoutes)
+app.use('/api/users',userRoutes)
 app.use(errorHandler)
 
 connectDB()

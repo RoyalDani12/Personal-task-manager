@@ -36,8 +36,15 @@ const userSchema = new mongoose.Schema(
       default:"user"
     },
 
-    avater:{
+    avatar:{
     type:String,
+    default:"https://images.pexels.com/photos/36540591/pexels-photo-36540591.jpeg"
+    },
+
+    bio: {
+      type: String,
+      maxlength: 200,
+      default: "Hey there! I'm using the Task Manager."
     },
 
     isActive: {
