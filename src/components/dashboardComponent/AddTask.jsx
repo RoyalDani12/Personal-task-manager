@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faCalendarDays } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faTerminal, faXmark } from "@fortawesome/free-solid-svg-icons";
 import addTaskApi from "../../api/addTask.Api";
 import { useNavigate } from "react-router-dom";
-const AddTask = ({ onSubmit }) => {
-  const navigate = useNavigate()
+
+const AddTask = () => {
+  const navigate = useNavigate();
   const [taskData, setTaskData] = useState({
     title: "",
     description: "",
@@ -17,7 +18,6 @@ const AddTask = ({ onSubmit }) => {
     isActive: true,
   });
 
-  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setTaskData({
@@ -26,158 +26,122 @@ const AddTask = ({ onSubmit }) => {
     });
   };
 
-  // Handle form submission
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await addTaskApi(taskData);
-    // Now response exists and contains data
-    console.log(response.data);
-    setTimeout((
-      navigate('/dashboard')
-    ),1000)
-    window.alert("Task created successfully")
-  } catch (error) {
-    // If using the throw logic above, error.data will contain your backend message
-    console.log(error.data?.message || "Something went wrong");
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await addTaskApi(taskData);
+      window.alert("Success: Task_Created");
+      setTimeout(() => navigate('/dashboard'), 500);
+    } catch (error) {
+      console.log(error.data?.message || "Error: Execution_Failed");
+    }
+  };
+
+  const inputStyle = "w-full bg-[#0E0F13] border border-slate-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#F7A600]/50 transition-all placeholder:text-slate-700 text-[#EAECEF]";
+  const labelStyle = "text-[10px] font-black text-slate-500 uppercase  ml-1 mb-2 block";
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-slate-800 rounded-xl shadow-lg text-white">
-      <h1 className="text-2xl font-bold mb-6 text-indigo-400">
-        <FontAwesomeIcon icon={faPlus} className="mr-2" />
-        Add New Task
-      </h1>
-
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
-        {/* Title */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Title *</label>
-          <input
-            type="text"
-            name="title"
-            value={taskData.title}
-            onChange={handleChange}
-            required
-            placeholder="Enter task title"
-            className="w-full p-3 rounded-xl bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            name="description"
-            value={taskData.description}
-            onChange={handleChange}
-            placeholder="Enter task description"
-            rows={4}
-            className="w-full p-3 rounded-xl bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-
-        {/* Status & Priority */}
-        <div className="flex gap-4 flex-wrap">
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">Status</label>
-            <select
-              name="status"
-              value={taskData.status}
-              onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="pending">Pending</option>
-              <option value="in-progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">Priority</label>
-            <select
-              name="priority"
-              value={taskData.priority}
-              onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">Difficulty</label>
-            <select
-              name="difficulityLevel"
-              value={taskData.difficulityLevel}
-              onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="easy">Easy</option>
-              <option value="meddium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Dates */}
-        <div className="flex gap-4 flex-wrap">
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">Start Date</label>
-            <input
-              type="date"
-              name="startedDate"
-              value={taskData.startedDate}
-              onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <div className="flex-1">
-            <label className="block text-sm font-medium mb-1">Due Date</label>
-            <input
-              type="date"
-              name="dueDate"
-              value={taskData.dueDate}
-              onChange={handleChange}
-              className="w-full p-3 rounded-xl bg-slate-700 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-        </div>
-
-        {/* Active Checkbox */}
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="isActive"
-            checked={taskData.isActive}
-            onChange={handleChange}
-            className="w-5 h-5 text-indigo-500 bg-slate-700 border-slate-600 rounded"
-          />
-          <label className="text-sm font-medium">Is Active</label>
-        </div>
-
-        {/* Submit */}
-        <button onClick={()=>navigate('/dashboard')}
-          type="button"
-          className="mt-4 bg-indigo-700 hover:bg-indigo-500 p-3 rounded-full font-semibold flex items-center justify-center gap-2 shadow-lg transition"
-        >
+    <div className="min-h-screen bg-[#0E0F13] flex items-center justify-center p-6 font-sans">
+      <div className="w-full max-w-3xl bg-[#17181E] border border-slate-800/60 rounded-2xl shadow-2xl p-10 relative">
         
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="mt-4 bg-indigo-600 hover:bg-indigo-500 p-3 rounded-full font-semibold flex items-center justify-center gap-2 shadow-lg transition"
-        >
-          <FontAwesomeIcon icon={faPlus} />
-          Add Task
-        </button>
+        <div className="flex justify-between items-start mb-10">
+          <div>
+            <h1 className="text-3xl font-black text-white  font-serif">
+              Create <span className="text-[#F7A600]">New task</span>
+            </h1>
+            <p className="text-slate-400 text-[10px] font-black  mt-2">
+                 initialize new process 
+            </p>
+          </div>
+          <FontAwesomeIcon icon={faTerminal} className="text-slate-800 text-2xl" />
+        </div>
 
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title */}
+          <div>
+            <label className={labelStyle}>task title:</label>
+            <input
+              type="text"
+              name="title"
+              value={taskData.title}
+              onChange={handleChange}
+              required
+              placeholder="Enter_Title..."
+              className={inputStyle}
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className={labelStyle}>task description:</label>
+            <textarea
+              name="description"
+              value={taskData.description}
+              onChange={handleChange}
+              placeholder="Enter_Task_Details..."
+              rows={3}
+              className={inputStyle}
+            />
+          </div>
+
+          {/* Row 1: Status, Priority, Difficulty */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className={labelStyle}>status:</label>
+              <select name="status" value={taskData.status} onChange={handleChange} className={inputStyle}>
+                <option value="pending">pending</option>
+                <option value="in-progress">in-progress</option>
+                <option value="completed">completed</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelStyle}>priority level:</label>
+              <select name="priority" value={taskData.priority} onChange={handleChange} className={inputStyle}>
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+              </select>
+            </div>
+            <div>
+              <label className={labelStyle}>difficulty:</label>
+              <select name="difficulityLevel" value={taskData.difficulityLevel} onChange={handleChange} className={inputStyle}>
+                <option value="easy">easy</option>
+                <option value="meddium">medium</option>
+                <option value="hard">hard</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Row 2: Dates */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className={labelStyle}>start date:</label>
+              <input type="date" name="startedDate" value={taskData.startedDate} onChange={handleChange} className={inputStyle} />
+            </div>
+            <div>
+              <label className={labelStyle}>due date:</label>
+              <input type="date" name="dueDate" value={taskData.dueDate} onChange={handleChange} className={inputStyle} />
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="flex flex-col md:flex-row gap-4 pt-6 border-t border-slate-800/50">
+             <button
+              type="button"
+              onClick={() => navigate('/dashboard')}
+              className="flex-1 border border-slate-800 text-slate-400 py-4 rounded-lg font-black text-xm  hover:bg-white/5 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FontAwesomeIcon icon={faXmark} /> Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-2 bg-[#F7A600] hover:bg-[#ffb700] text-black py-4 px-12 rounded-lg font-black text-xm  transition-all shadow-lg shadow-[#F7A600]/10 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <FontAwesomeIcon icon={faPlus}  /> Add new task
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

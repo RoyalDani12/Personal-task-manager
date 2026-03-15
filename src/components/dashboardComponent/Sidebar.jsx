@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faGear,
@@ -8,7 +8,8 @@ import {
   faFlag,
   faUser,
   faBars,
-  faNoteSticky
+  faNoteSticky,
+  faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
@@ -21,81 +22,90 @@ const menuItems = [
   { icon: faGear, label: "Settings" }
 ];
 
-const Sidebar = ({ UserName, userId, avatar }) => {
+const Sidebar = ({ UserName, avatar }) => {
   const navigate = useNavigate();
+  // State to manage collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="
+    <div className={`
       h-screen
-      w-64
-      bg-slate-900
-      border-r border-slate-800
-      flex
-      flex-col
-      justify-between
-    ">
+      ${isCollapsed ? "w-20" : "w-64"} 
+      bg-[#0E0F13] 
+      border-r border-slate-800/60 
+      flex flex-col justify-between
+      transition-all duration-300 ease-in-out
+      relative
+    `}>
+      
+      {/* Toggle Button - Floating Style */}
+      <button 
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-10 w-6 h-6 bg-[#F7A600] rounded-full flex items-center justify-center text-black text-[10px] shadow-lg z-50 hover:scale-110 transition-transform"
+      >
+        <FontAwesomeIcon icon={faChevronLeft} className={`${isCollapsed ? "rotate-180" : ""} transition-transform`} />
+      </button>
 
       {/* Top Section */}
       <div>
-        {/* Logo */}
-        <div className="
-          flex
-          items-center
-          justify-between
-          px-6
-          py-6
-          border-b
-          border-slate-800
-        ">
-          <h1 className="text-white text-xl font-semibold tracking-wide">
-            TaskFlow
-          </h1>
-          <FontAwesomeIcon
-            icon={faBars}
-            className="text-slate-400 cursor-pointer hover:text-white transition"
-          />
+        {/* Logo Section */}
+        <div className="flex items-center gap-3 px-6 py-8 mb-4">
+          <div className="min-w-[32px] h-8 bg-[#F7A600] rounded flex items-center justify-center text-black font-black italic">
+            AX
+          </div>
+          {!isCollapsed && (
+            <h1 className="text-white text-lg font-bold tracking-tighter animate-in fade-in duration-500">
+              AXONE.<span className="text-[#F7A600]">PRO</span>
+            </h1>
+          )}
         </div>
 
-        {/* Menu */}
-        <ul className="mt-6 space-y-2 px-3">
+        {/* Menu Items */}
+        <ul className="space-y-1 px-3">
           {menuItems.map((item, index) => (
             <li
               key={index}
               className="
-                flex
-                items-center
-                gap-4
-                px-4
-                py-3
+                group
+                flex items-center gap-4
+                px-4 py-3
                 rounded-lg
                 text-slate-400
                 cursor-pointer
                 transition-all
-                duration-200
-                hover:bg-slate-800
-                hover:text-indigo-400
-                hover:translate-x-1
+                hover:bg-[#F7A600]/10
+                hover:text-[#F7A600]
               "
             >
-              <FontAwesomeIcon icon={item.icon} />
-              <span className="text-sm font-medium">{item.label}</span>
+              <div className="min-w-[20px] flex justify-center">
+                <FontAwesomeIcon icon={item.icon} className="text-lg" />
+              </div>
+              {!isCollapsed && (
+                <span className="text-sm font-semibold tracking-wide whitespace-nowrap animate-in slide-in-from-left-2">
+                  {item.label}
+                </span>
+              )}
+              
+              {/* Tooltip for collapsed mode */}
+              {isCollapsed && (
+                <div className="absolute left-16 bg-slate-800 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                  {item.label}
+                </div>
+              )}
             </li>
           ))}
         </ul>
       </div>
 
-      {/* User Profile */}
-      <div className="
-        border-t
-        border-slate-800
-        p-6
-        flex
-        items-center
-        gap-4
-      ">
-        {/* Avatar */}
+      {/* User Profile Section */}
+      <div className={`
+        border-t border-slate-800/60 
+        p-4 mb-4
+        flex items-center 
+        ${isCollapsed ? "justify-center" : "gap-4"}
+      `}>
         <div
-          className="w-10 h-10 rounded-full overflow-hidden cursor-pointer"
+          className="w-10 h-10 min-w-[40px] rounded-full overflow-hidden cursor-pointer border border-slate-700 hover:border-[#F7A600] transition-colors"
           onClick={() => navigate("/profile-page")}
         >
           {avatar ? (
@@ -105,15 +115,20 @@ const Sidebar = ({ UserName, userId, avatar }) => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-indigo-500 flex items-center justify-center text-white">
+            <div className="w-full h-full bg-slate-800 flex items-center justify-center text-slate-400">
               <FontAwesomeIcon icon={faUser} />
             </div>
           )}
         </div>
 
-        <p className="text-slate-300 text-sm font-medium">
-          {UserName?.toUpperCase()}
-        </p>
+        {!isCollapsed && (
+          <div className="overflow-hidden">
+            <p className="text-[#EAECEF] text-xs font-bold truncate">
+              {UserName?.toUpperCase()}
+            </p>
+            {/* <p className="text-slate-500 text-[10px] font-medium">Verified Account</p> */}
+          </div>
+        )}
       </div>
     </div>
   );

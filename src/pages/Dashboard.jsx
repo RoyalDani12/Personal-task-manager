@@ -5,108 +5,92 @@ import TaskCard from "../components/dashboardComponent/TaskCard";
 import getTask from "../api/getTask.api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faPlayCircle, faClock, faTasks, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [userName, setUserName] = useState('');
-  const [user ,setUserData ] = useState('')
-  const navigate = useNavigate()
+  const [user, setUserData] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTasks();
     const userDataString = localStorage.getItem("user");
     if (userDataString) {
       const userData = JSON.parse(userDataString);
-      if (userData?.data.name){
-         setUserName(userData.data.name);
-         setUserData(userData.data)
-        //  console.log("dani this is user id ",userId);
-         
+      if (userData?.data.name) {
+        setUserName(userData.data.name);
+        setUserData(userData.data);
       }
     }
   }, []);
-
-//   useEffect(() => {
-//   if (user) {
-//     console.log("Verified User ID has updated:", user);
-//   }
-// }, [user]);
 
   const fetchTasks = async () => {
     const response = await getTask();
     setTasks(response?.data || []);
   };
 
-  // const handleDelete = async (id) => {
-
-  //   console.log("Deleting task:", id);
-  // };
-
-
-
   const completed = tasks.filter((task) => task.status === "completed").length;
   const active = tasks.filter((task) => task.status === "in-progress").length;
   const pending = tasks.filter((task) => task.status === "pending").length;
 
   return (
-    <div className=" bg-[#0f172a] flex h-screen overflow-hidden text-slate-200 font-sans">
-        <Sidebar
-          UserName={user.name}
-          // userId={user._id}
-          avatar={user.avatar}
-        />
+    // Changed bg to Bybit's deep obsidian
+    <div className="bg-[#0E0F13] flex h-screen overflow-hidden text-[#EAECEF] font-sans">
+      <Sidebar UserName={user.name} avatar={user.avatar} />
 
-      <main className="flex-1 p-8 overflow-y-auto overflow-hidden h-full">
-        <Header 
-        UserName={userName}
-        // userId={user}
-         />
+      <main className="flex-1 px-10 py-8 overflow-y-auto h-full scrollbar-hide">
+        <Header UserName={userName} />
 
-        <div className="flex justify-between items-center mt-10 mb-8">
+        <div className="flex justify-between items-end mt-12 mb-10">
           <div>
-            <h1 className="text-2xl font-bold text-white">Project Dashboard</h1>
-            <p className="text-slate-400 text-sm">Manage your team and track progress.</p>
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">Task Managment Overview</h1>
+            <p className="text-slate-500 text-sm mt-1">Real-time task tracking and performance metrics.</p>
           </div>
+          
+          {/* Action Button: Bybit Yellow Style */}
           <button
-            onClick={()=> navigate('/create-task')}
-            className="bg-green-600 hover:bg-green-700 text-black px-6 py-3 rounded-3xl flex items-center gap-2 font-semibold shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+            onClick={() => navigate('/create-task')}
+            className="bg-[#F7A600] hover:bg-[#ffb700] text-black px-8 py-3 rounded-lg flex items-center gap-3 font-bold transition-all active:scale-95 shadow-[0_8px_20px_rgba(247,166,0,0.15)]"
           >
-            <FontAwesomeIcon icon={faPlus} />
-            Add Task
+            <FontAwesomeIcon icon={faPlus} className="text-sm" />
+            ADD Task
           </button>
         </div>
 
-        {/* Task Summary Cards - Updated for consistency */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats Grid: Minimalist, Trading-Platform Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            { label: "Completed", count: completed, icon: faCheckCircle, color: "text-green-400", bg: "bg-green-400/10", shadow: "hover:shadow-green-500/10" },
-            { label: "Active", count: active, icon: faPlayCircle, color: "text-blue-400", bg: "bg-blue-400/10", shadow: "hover:shadow-blue-500/10" },
-            { label: "Pending", count: pending, icon: faClock, color: "text-yellow-400", bg: "bg-yellow-400/10", shadow: "hover:shadow-yellow-500/10" },
-            { label: "Total Tasks", count: tasks.length, icon: faTasks, color: "text-indigo-400", bg: "bg-indigo-400/10", shadow: "hover:shadow-indigo-500/10" }
+            { label: "Filled", count: completed, icon: faCheckCircle, color: "text-[#00B464]", bg: "bg-[#00B464]/10" },
+            { label: "Active", count: active, icon: faPlayCircle, color: "text-[#F7A600]", bg: "bg-[#F7A600]/10" },
+            { label: "Pending", count: pending, icon: faClock, color: "text-[#848E9C]", bg: "bg-slate-800/20" },
+            { label: "All Assets", count: tasks.length, icon: faTasks, color: "text-white", bg: "bg-slate-800/40" }
           ].map((stat, index) => (
-            <div key={index} className={`bg-slate-800/40 border border-slate-700/50 rounded-2xl p-3 flex flex-col items-center transition-all duration-300 hover:bg-slate-800/60 shadow-xl ${stat.shadow}`}>
-              <div className={`${stat.bg}  rounded-2xl mb-3`}>
-                <FontAwesomeIcon icon={stat.icon} className={`${stat.color} text-2xl`} />
+            <div key={index} className="bg-[#17181E] border border-slate-800/60 rounded-xl p-5 flex flex-col transition-all hover:border-slate-700">
+              <div className="flex justify-between items-start mb-4">
+                <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">{stat.label}</p>
+                <div className={`${stat.bg} p-2 rounded-lg`}>
+                  <FontAwesomeIcon icon={stat.icon} className={`${stat.color} text-sm`} />
+                </div>
               </div>
-              <p className="text-3xl font-bold text-white tracking-tight">{stat.count}</p>
-              <p className="text-slate-400 text-sm font-medium uppercase tracking-wider mt-1">{stat.label}</p>
+              <p className="text-3xl font-mono font-bold text-white tracking-tighter">
+                {stat.count.toString().padStart(2, '0')}
+              </p>
             </div>
           ))}
         </div>
 
         {/* Task Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 mb-10">
           {tasks.length > 0 ? (
             tasks.map((task) => (
-              <Link key={task._id} to={`/task-detail/${task._id}`} className="block h-full">
-                <TaskCard item={task}  />
+              <Link key={task._id} to={`/task-detail/${task._id}`} className="block h-full no-underline">
+                <TaskCard item={task} />
               </Link>
             ))
           ) : (
-            <div className="col-span-full py-20 text-center bg-slate-800/20 rounded-3xl border border-dashed border-slate-700">
-              <p className="text-slate-500 text-lg">No tasks to show.</p>
+            <div className="col-span-full py-32 text-center bg-[#17181E] rounded-2xl border border-dashed border-slate-800">
+              <p className="text-slate-600 font-medium">No active positions found.</p>
             </div>
           )}
         </div>
