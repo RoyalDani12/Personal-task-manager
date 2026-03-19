@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 
 // accessToken
 export const generateAccessToken =(payload)=>{
-  return jwt.sign(payload,process.env.SECRET_KEY,{expiresIn:"30m"})
+  return jwt.sign(payload,process.env.SECRET_KEY,{expiresIn:"15m"})
 }
  
 //refresh token

@@ -26,6 +26,14 @@ const  authMiddleware =(roles =[])=>{
 
       next()
     } catch (err) {
+
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ 
+          success: false, 
+          message: "Token expired", 
+          code: "TOKEN_EXPIRED" 
+        });
+      }
      next(err) 
     }
   }
