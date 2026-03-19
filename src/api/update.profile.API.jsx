@@ -1,20 +1,11 @@
 import axios from "axios";
-
+import api from "./api.Centeral";
 
 const updateProfile=async(id,profileData)=>{
 
 try {
-  const URL=`http://localhost:5000/api/users/upload-profile/${id}`
 
-  const token = localStorage.getItem('accessToken')
-
-  const response = await axios.post(URL,profileData,{
-    headers:{
-      Authorization:`Bearer ${token}`,
-      "Content-Type":"multipart/form-data"
-    },
-    withCredentials:true
-  })
+  const response = await api.post(`/users/upload-profile/${id}`,profileData)
 
   return response
 } catch (error) {

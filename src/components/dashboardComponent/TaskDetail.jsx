@@ -1,16 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import getTaskDetailApi from "../../api/task.Detail.Api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faTrash, faBackward, faCalendarCheck, faSignal, faLayerGroup } from "@fortawesome/free-solid-svg-icons";
+import { 
+  faUpload, faTrash, faCalendarCheck, 
+  faLayerGroup, faHourglassHalf 
+} from "@fortawesome/free-solid-svg-icons";
+
+// API & Components
+import getTaskDetailApi from "../../api/task.Detail.Api";
 import deleteTask from "../../api/delete.task.Api";
 import Footer from "../Footer";
+import Sidebar from "./Sidebar";
+import { calculateProgress } from "../../utils/progress.utils";
+import { formatDate, calculateTimeLeft } from "../../utils/time.utils";
 
 const TaskDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [task, setTask] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState("");
+  const [progress, setProgress] = useState(0);
+  
+  // State to sync with Sidebar width
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -20,7 +33,7 @@ const TaskDetail = () => {
           setTask(result.data.response);
         }
       } catch (error) {
-        console.error("Fetch error :", error);
+        console.error("Fetch error:", error);
       } finally {
         setLoading(false);
       }
@@ -28,10 +41,36 @@ const TaskDetail = () => {
     if (id) fetchDetail();
   }, [id]);
 
+  useEffect(() => {
+    if (!task) return;
+    const update = () => {
+      setTimeLeft(calculateTimeLeft(task));  
+      setProgress(calculateProgress(task));   
+    };
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, [task]);
+
+  const handleDelete = async (taskId) => {
+    const confirm = window.confirm("System Warning: Permanent deletion requested. Proceed?");
+    if (!confirm) return;
+    try {
+      await deleteTask(taskId);
+      navigate("/dashboard");
+    } catch (error) {
+      alert(error.message || "Failed to terminate the task");
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-[#0E0F13] text-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-[#F7A600]"></div>
+      <div className="flex flex-col justify-center items-center h-screen bg-[#0E0F13] text-white">
+        <div className="relative">
+          <div className="absolute inset-0 border-t-2 border-[#F7A600] rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-2 border-slate-800 rounded-full"></div>
+        </div>
+        <p className="mt-4 text-[10px] font-mono tracking-[0.4em] text-slate-500 uppercase">Synchronizing_Node...</p>
       </div>
     );
   }
@@ -39,150 +78,113 @@ const TaskDetail = () => {
   if (!task) {
     return (
       <div className="text-white p-10 bg-[#0E0F13] h-screen flex flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold mb-4">Task record not found</h1>
-        <button onClick={() => navigate('/dashboard')} className="text-[#F7A600] uppercase text-xs font-bold tracking-widest">Return to Dashboard</button>
+        <h1 className="text-xl font-black mb-6 uppercase tracking-widest text-slate-600">Entry_Not_Found</h1>
+        <button onClick={() => navigate('/dashboard')} className="border border-slate-700 px-8 py-3 rounded-lg text-xs font-bold uppercase hover:bg-slate-800 transition-all">Return to Hub</button>
       </div>
     );
   }
 
-  const formatDate = (date) => {
-    if (!date) return "Not set";
-    return new Date(date).toLocaleDateString("en-US", {
-      month: "short", day: "numeric", year: "numeric"
-    });
-  };
-
-  const handleDelete = async (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this task?");
-    if (!confirm) return;
-    try {
-      await deleteTask(id);
-      navigate("/dashboard");
-    } catch (error) {
-      alert(error.message || "Failed to delete the task");
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-[#0E0F13] text-[#EAECEF] font-sans selection:bg-[#F7A600]/30">
+    <div className="min-h-screen bg-[#0E0F13] text-[#EAECEF] font-sans flex">
       
-      {/* HEADER: Minimal & Professional */}
-      <div className="border-b border-slate-800/60 bg-[#17181E]/50 backdrop-blur-md px-8 py-6 sticky top-0 z-10 flex justify-between items-center">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em] mb-1">
-            Task ID: {task._id.slice(-8).toUpperCase()}
-          </span>
-          <h1 className="text-2xl font-black text-white tracking-tight">
+      {/* SIDEBAR - Pass state down if needed, but here we use the CSS logic */}
+      <Sidebar onCollapse={setIsSidebarCollapsed} />
+
+      {/* MAIN CONTENT 
+          Logic: 
+          - On Mobile: pl-0 (Sidebar is an overlay)
+          - On Desktop: transition padding based on Sidebar width
+      */}
+      <div className={`flex-1 transition-all duration-300 flex flex-col min-h-screen w-full
+        ${isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64"} pl-0`}>
+
+        {/* NAV: Responsive stacking */}
+        <nav className="border-b border-slate-800 bg-[#17181E] px-4 md:px-8 py-6 sticky top-0 z-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h1 className="text-xl md:text-2xl font-black text-white uppercase truncate mt-12 md:mt-0">
             {task.title}
           </h1>
-        </div>
 
-        <div className="flex gap-3">
-          <button 
-            onClick={() => navigate(`/update/${task._id}`)} 
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#F7A600] text-black hover:bg-[#ffb700] transition-all font-bold text-sm shadow-lg shadow-[#F7A600]/10"
-          >
-            <FontAwesomeIcon icon={faUpload} className="text-xs"/>
-            Update
-          </button>
-          <button 
-            onClick={() => handleDelete(task._id)} 
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all font-bold text-sm"
-          >
-            <FontAwesomeIcon icon={faTrash} className="text-xs"/>
-            Delete
-          </button>
-        </div>
-      </div>
-
-      <main className="max-w-7xl mx-auto px-8 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
-          {/* LEFT: PRIMARY CONTENT (8 cols) */}
-          <div className="lg:col-span-8 space-y-8">
-            
-            {/* META STRIP */}
-            <div className="flex gap-4">
-               <div className="bg-[#17181E] border border-slate-800 px-4 py-2 rounded-lg flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-300">{task.status}</span>
-               </div>
-               <div className="bg-[#17181E] border border-slate-800 px-4 py-2 rounded-lg flex items-center gap-3">
-                  <FontAwesomeIcon icon={faSignal} className="text-[#F7A600] text-[10px]" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-300">Level: {task.priority}</span>
-               </div>
-            </div>
-
-            {/* DESCRIPTION BOX */}
-            <div className="bg-[#17181E] border border-slate-800 rounded-2xl p-8 relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#F7A600] opacity-50 group-hover:opacity-100 transition-opacity"></div>
-              <div className="flex items-center gap-3 mb-6 text-slate-500">
-                <FontAwesomeIcon icon={faLayerGroup} className="text-xs" />
-                <h3 className="text-xs font-black uppercase tracking-[0.2em]">Context & Description</h3>
-              </div>
-              <p className="text-slate-300 leading-relaxed text-[16px] whitespace-pre-line">
-                {task.description || "No specific details provided for this entry."}
-              </p>
-            </div>
-
-            {/* BACK ACTION */}
-            <button 
-              onClick={() => navigate('/dashboard')} 
-              className="flex items-center gap-2 text-slate-500 hover:text-[#F7A600] transition-colors text-xs font-bold uppercase tracking-widest pt-4"
-            >
-              <FontAwesomeIcon icon={faBackward}/>
-              Back to Dashboard
+          <div className="flex gap-2 w-full md:w-auto">
+            <button onClick={() => navigate(`/update/${task._id}`)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 hover:text-[#F7A600] text-sm font-bold">
+              <FontAwesomeIcon icon={faUpload} /> Modify
+            </button>
+            <button onClick={() => handleDelete(task._id)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-red-500 text-white text-sm font-bold">
+              <FontAwesomeIcon icon={faTrash} /> Delete
             </button>
           </div>
+        </nav>
 
-          {/* RIGHT: DATA SIDEBAR (4 cols) */}
-          <div className="lg:col-span-4 space-y-6">
-            
-            {/* INTEGRATED TASK INFO CARD */}
-            <div className="bg-[#17181E] border border-slate-800 rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800/50">
-                <FontAwesomeIcon icon={faCalendarCheck} className="text-[#F7A600]" />
-                <h4 className="text-xs font-black text-white uppercase tracking-widest">Schedule Details</h4>
+        {/* MAIN BODY */}
+        <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 flex-grow w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
+
+            {/* LEFT SIDE */}
+            <div className="lg:col-span-8 space-y-8">
+              <div className="bg-[#17181E] border border-slate-800 p-6 md:p-8 rounded-2xl">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                  <div className="w-14 h-14 bg-[#F7A600]/10 rounded-xl flex items-center justify-center text-[#F7A600]">
+                    <FontAwesomeIcon icon={faHourglassHalf} className="text-2xl" />
+                  </div>
+                  <div>
+                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">Time Remaining</p>
+                    <p className={`text-2xl md:text-3xl font-mono font-bold ${timeLeft === "EXPIRED" ? "text-red-500" : "text-white"}`}>
+                      {timeLeft}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                  <div className="text-center sm:text-left">
+                    <p className="text-slate-500 text-xs font-bold uppercase">Priority</p>
+                    <p className="text-[#F7A600] font-bold">{task.priority}</p>
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <button className="flex-1 sm:px-8 py-2 bg-[#F7A600] rounded font-bold text-black">Start</button>
+                    <button className="flex-1 sm:px-8 py-2 bg-slate-800 rounded font-bold text-white">Stop</button>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-5">
-                <div className="flex justify-between items-center">
-                  <span className="text-[11px] text-slate-500 font-bold uppercase">Entry Date</span>
-                  <span className="text-sm font-mono text-slate-200">{formatDate(task.createdAt)}</span>
+              {/* PROGRESS */}
+              <div className="bg-[#17181E] border border-slate-800 p-6 md:p-8 rounded-2xl">
+                <p className="text-slate-500 text-xs font-bold uppercase mb-4">Progress Status</p>
+                <div className="bg-slate-900 rounded-full h-3 w-full overflow-hidden">
+                  <div className="h-full bg-green-600 transition-all duration-500" style={{ width: `${progress}%` }}></div>
                 </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="text-[11px] text-slate-500 font-bold uppercase text-rose-500/80">Deadline</span>
-                  <span className="text-sm font-mono text-rose-400 font-bold">{formatDate(task.dueDate)}</span>
-                </div>
+                <p className="mt-2 text-sm font-bold text-white">{progress}% Completed</p>
+              </div>
 
-                <div className="flex justify-between items-center">
-                  <span className="text-[11px] text-slate-500 font-bold uppercase">Complexity</span>
-                  <span className="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 font-bold">
-                    {task.difficulityLevel}
-                  </span>
+              {/* DESCRIPTION */}
+              <div className="bg-[#17181E] border border-slate-800 p-6 md:p-8 rounded-2xl">
+                <div className="flex items-center gap-3 mb-4 text-[#F7A600]">
+                  <FontAwesomeIcon icon={faLayerGroup} />
+                  <span className="text-white font-bold text-xs uppercase">Description</span>
                 </div>
-
-                <div className="pt-4 mt-4 border-t border-slate-800/50 flex justify-between items-center">
-                  <span className="text-[11px] text-slate-500 font-bold uppercase tracking-tighter">Availability</span>
-                  <span className={`text-[10px] font-black ${task.isActive ? 'text-[#00B464]' : 'text-slate-600'}`}>
-                    {task.isActive ? "● ONLINE / ACTIVE" : "○ ARCHIVED"}
-                  </span>
-                </div>
+                <p className="text-slate-400 leading-relaxed">{task.description}</p>
               </div>
             </div>
 
-            {/* PERSONAL NOTE TIP */}
-            <div className="p-5 border border-dashed border-slate-800 rounded-2xl opacity-60">
-               <p className="text-[10px] text-slate-500 leading-relaxed italic">
-                 This is a private task entry. Data is stored locally and synced to your personal cloud instance.
-               </p>
+            {/* RIGHT SIDE */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="bg-[#17181E] border border-slate-800 p-6 rounded-2xl">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-slate-400">
+                    <FontAwesomeIcon icon={faCalendarCheck} />
+                    <span className="text-xs font-bold uppercase">Metadata</span>
+                  </div>
+                  <p className="text-sm text-slate-300">Created: <span className="text-white">{formatDate(task.createdAt)}</span></p>
+                  <p className="text-sm text-slate-300">Due: <span className="text-white">{formatDate(task.dueDate)}</span></p>
+                  <div className="pt-4 border-t border-slate-800">
+                    <span className="px-3 py-1 bg-[#F7A600]/10 text-[#F7A600] text-[10px] font-bold rounded-full uppercase">Status: {task.status}</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
           </div>
-        </div>
-      </main>
-      <Footer/>
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 };

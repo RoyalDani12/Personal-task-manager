@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTerminal, faXmark } from "@fortawesome/free-solid-svg-icons";
 import addTaskApi from "../../api/addTask.Api";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const AddTask = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const AddTask = () => {
     try {
       const response = await addTaskApi(taskData);
       window.alert("Success: Task_Created");
+      toast.success("Task created succefully")
       setTimeout(() => navigate('/dashboard'), 500);
     } catch (error) {
       console.log(error.data?.message || "Error: Execution_Failed");

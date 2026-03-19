@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRotate, faXmark, faDatabase } from "@fortawesome/free-solid-svg-icons";
 import getTaskDetailApi from '../../api/task.Detail.Api'
 import updateAPI from '../../api/update.API'
+import { toast } from 'react-toastify';
 
 const UpdateTask = () => {
   const navigate = useNavigate()
@@ -24,11 +25,21 @@ const UpdateTask = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!window.confirm("Confirm: Update_Existing_Task?")) return;
+    
+    if (!window.confirm("Confirm: are you sure update the task ?")) {
+      //  navigate(`/task-detail/${id}`)
+     return;
+    }
+    
     try {
       await updateAPI(id, taskData)
-      window.alert('Success: Task_Updated')
-      navigate('/dashboard')
+      
+      toast.success("update successfully")
+    
+      setTimeout(()=>{
+           navigate(`/task-detail/${id}`)
+      },2000)
+     
     } catch (error) {
       console.error("Error:", error)
     }
@@ -123,11 +134,11 @@ const UpdateTask = () => {
           <div className="flex flex-col md:flex-row gap-4 pt-6 border-t border-slate-800/50">
             <button
               type="button"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate(`/task-detail/${id}`)}
               className="flex-1 border border-slate-800 text-slate-400 py-4 rounded-lg font-black text-xm  hover:bg-white/5 transition-all flex items-center justify-center gap-2"
             >
               <FontAwesomeIcon icon={faXmark} /> Cancel Update         </button>
-            <button
+            <button  
               type="submit"
               className="flex-2 bg-[#F7A600] hover:bg-[#ffb700] text-black py-4 px-12 rounded-lg font-black text-xm  transition-all shadow-lg shadow-[#F7A600]/10 flex items-center justify-center gap-2"
             >

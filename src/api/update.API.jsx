@@ -1,23 +1,13 @@
-import axios from "axios";
+import api from "./api.Centeral"
 
 
 const updateAPI =async(id,updatedData)=>{
 
   
    try {
-    
 
-    const URL =`http://localhost:5000/api/tasks/update-task/${id}`
-    const token = localStorage.getItem('accessToken')
 
-    const response = await axios.put(URL,updatedData,
-       {
-        headers:{
-          Authorization:`Bearer ${token}`
-        },
-        withCredentials:true
-       }
-    )
+    const response = await api.put(`/tasks/update-task/${id}`,updatedData)
 
     return response
 

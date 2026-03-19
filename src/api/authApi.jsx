@@ -1,4 +1,5 @@
 import axios from 'axios';
+import api from './api.Centeral';
 
 const URL = 'http://localhost:5000/api/auth/register';
 
@@ -13,13 +14,12 @@ const registerUserAPI = (userData) => {
 
 export default registerUserAPI;
 
-
-export const loginAPI =(data)=>{
-  return axios.post(
-   'http://localhost:5000/api/auth/login',data,{
-    headers:{
-    "content-Type":"application/json",
-    },
-    // withCredentials:true
-   })
-}
+export const loginAPI = async (data) => {
+  try {
+    const response = await api.post('/auth/login', data);
+    return response; // Return the whole response object
+  } catch (error) {
+    // CRITICAL: Throw the error so the Frontend 'catch' block catches it
+    throw error; 
+  }
+};
