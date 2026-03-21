@@ -4,10 +4,13 @@ export const userRepository = {
 
   async findUserByEmailWithPassword(email) {
     return await User.findOne({ email }).select("+password");
+    // user is login the pass must be retrive 
+    // to check the pass is match that is why +password
   },
 
   async findUserByEmail(email) {
     return await User.findOne({ email });
+    //user register
   },
 
   async createUser(data) {
@@ -29,7 +32,7 @@ export const userRepository = {
       userId,
       { $set:data }, // only update the filde provided in the data
       {
-        returnDocument:"after", //  substitute new: true
+        returnDocument:"after", //  Substitute new: true
         runValidators:true
       }
     )

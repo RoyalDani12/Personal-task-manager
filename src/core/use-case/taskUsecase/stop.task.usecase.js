@@ -33,7 +33,7 @@ export const stopTaskUseCase=async(taskId,userId,taskRepository)=>{
     const workedTime = lastSession.endTime - lastSession.startTime
 
     // update the total time
-    foundTask.totalWorkTime = foundTask.totalWorkTime + workedTime
+    foundTask.totalWorkedTime = foundTask.totalWorkedTime + workedTime
 
     // stop running
     foundTask.isRunning = false

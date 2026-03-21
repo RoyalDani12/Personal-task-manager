@@ -74,7 +74,7 @@ export default User
 
 
 
-//    addtional taskss we have to add
+//    additional tasks we have to add
   // 1, email reminder
   // 2, push notification
-  // 3, search and filtter By status,priority, date ranged
+  // 3, search and fillter By status,priority, date ranged

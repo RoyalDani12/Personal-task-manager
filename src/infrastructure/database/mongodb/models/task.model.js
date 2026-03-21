@@ -40,14 +40,22 @@ const taskSchema = new mongoose.Schema(
     },
     dueDate: {
       type: Date,
-    },        //   add when it should be  started
-    comments: [
+    },  
+    sessions :[
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Comment", // optional, if you implement comments later
-      },
-    ],
-      //  how can identify the system  the user is active of not active
+        startTime:Date,
+        endTime:Date
+      }
+    ] ,
+    totalWorkedTime:{
+      type:Number,// milliseconds
+      default:0
+    }  ,
+    isRunning:{
+      type:Boolean,
+      default:false
+    },   //   add when it should be  started
+     //  how can identify the system  the user is active of not active
     isActive: {
       type: Boolean,
       default: true,

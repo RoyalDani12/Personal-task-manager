@@ -21,14 +21,15 @@ const fileFilter =(req,file,cb)=>{
   if(file.mimetype.startsWith('image/')){
     cb(null,true)
   }else{
-    cb(new Error('Only image are allowed !!'))
+    cb(new Error('Only Image files allowed !!'))
   }
 }
 
  export const uplaod =multer({
   storage,
   fileFilter,
-  limits:{ fileSize: 1024*1024*2 }
+  limits:{ fileSize: 1024*1024*2 } 
+  // the file size must be Not more that 2 MB
 })
 
 

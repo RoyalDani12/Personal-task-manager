@@ -5,15 +5,14 @@
   // pass the request to the controller
   const { id } = req.params
   const userId = req.user.id
-  const response = await startTaskUseCase(userId,id,taskRepository)
+  const response = await startTaskUseCase(id,userId,taskRepository)
 
   res.status(200).json({
   success:true,
   message:" session starts successfully",
   response
  })
- }
+ })
 
- )
-
+ 
  export default startTaskController 

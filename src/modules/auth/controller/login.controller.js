@@ -23,7 +23,7 @@ const loginController = expressAsyncHandler( async(req,res)=>{
   })
 
 
-   // save rfrshe toekn to the cookie
+   // save rfresh token to the cookie
    res.cookie('refreshToken',refreshToken,{
     httpOnly:true,
     sameSite:"strict",

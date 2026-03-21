@@ -5,6 +5,8 @@ import getTasksController from '../controller/geTasks.controller.js'
 import deleteTskController from '../controller/deleteTask.controller.js'
 import updateTaskController from '../controller/updateTask.controller.js'
 import taskDetailController from '../controller/task.Detail.Controller.js'
+import startTaskController from '../controller/start.task.controller.js'
+import { stopTaskController } from '../controller/stop.task.controller.js'
 
 const router = express.Router()
 
@@ -18,6 +20,9 @@ router.delete('/delete/:id',authMiddleware(),deleteTskController) // add delete 
  router.put('/update-task/:id',authMiddleware(),updateTaskController)
  router.get('/task-detail/:id',authMiddleware() ,taskDetailController)
 
+ 
 router.get('/all',authMiddleware())
+ router.post('/start-task/:id',authMiddleware(),startTaskController)
+ router.post('/stop-task/:id',authMiddleware(),stopTaskController)
 
 export default router
