@@ -1,31 +1,33 @@
 
-export const calculateProgress =(task)=>{
+export const calculateProgress = (task) => {
+  if (!task || !task.createdAt || !task.dueDate) return 0;
 
+  const start = new Date(task.createdAt).getTime();
+  const end = new Date(task.dueDate).getTime();
+  
 
-   if(!task || !task.createdAt || !task.dueDate){
-    return 0
-   }
+  const totalAllocatedTime = end - start;
 
-   const start = new Date(task.createdAt)
-   const end = new Date(task.dueDate)
-   const now = new Date()
+  if (totalAllocatedTime <= 0) return 0;
 
-   const total =  end - start
-   const passed = now - start 
+  
+  let totalWorked = task.totalWorkedTime || 0;
 
-   if(total <=0){
-    return 0
-   }
-    let percent = (passed/total)*100
-
-    if(percent < 0){
-      percent = 0
+  
+  if (task.isRunning && task.sessions?.length > 0) {
+    const lastSession = task.sessions[task.sessions.length - 1];
+    if (lastSession.startTime && !lastSession.endTime) {
+      const liveSessionDuration = new Date().getTime() - new Date(lastSession.startTime).getTime();
+      totalWorked += liveSessionDuration;
     }
-      
+  }
 
-    if(percent > 100) {
-      percent = 100
-    }
+  
+  let percent = (totalWorked / totalAllocatedTime) * 100;
 
-    return percent.toFixed(1)
-}
+  // Clamp between 0 and 100
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+
+  return percent.toFixed(4);
+};

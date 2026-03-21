@@ -13,6 +13,8 @@ import Footer from "../Footer";
 import Sidebar from "./Sidebar";
 import { calculateProgress } from "../../utils/progress.utils";
 import { formatDate, calculateTimeLeft } from "../../utils/time.utils";
+import { startTaskApi } from "../../api/start.task.api";
+import { stopTaskApi } from "../../api/stop.task.api";
 
 const TaskDetail = () => {
   const navigate = useNavigate();
@@ -21,9 +23,11 @@ const TaskDetail = () => {
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState("");
   const [progress, setProgress] = useState(0);
-  
-  // State to sync with Sidebar width
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Constants for 3D Circular Progress (Radius 90)
+  const strokeDasharray = 565.48; 
+  const strokeDashoffset = strokeDasharray - (progress / 100) * strokeDasharray;
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -43,12 +47,12 @@ const TaskDetail = () => {
 
   useEffect(() => {
     if (!task) return;
-    const update = () => {
+    const updateUI = () => {
       setTimeLeft(calculateTimeLeft(task));  
       setProgress(calculateProgress(task));   
     };
-    update();
-    const timer = setInterval(update, 1000);
+    updateUI();
+    const timer = setInterval(updateUI, 1000);
     return () => clearInterval(timer);
   }, [task]);
 
@@ -60,6 +64,32 @@ const TaskDetail = () => {
       navigate("/dashboard");
     } catch (error) {
       alert(error.message || "Failed to terminate the task");
+    }
+  };
+
+  const handleStart = async () => {
+    try {
+      const result = await startTaskApi(task._id);
+      if (result.data && result.data.success) {
+        setTask(result.data.response); 
+        alert("Session synchronized: Started");
+      }
+    } catch (error) {
+      console.error("Start Error:", error);
+      alert("Failed to initiate session node.");
+    }
+  };
+
+  const handleStop = async () => {
+    try {
+      const result = await stopTaskApi(task._id);
+      if (result.data && result.data.success) {
+        setTask(result.data.response);
+        alert("Session synchronized: Terminated");
+      }
+    } catch (error) {
+      console.error("Stop Error:", error);
+      alert("Failed to close session node.");
     }
   };
 
@@ -86,21 +116,14 @@ const TaskDetail = () => {
 
   return (
     <div className="min-h-screen bg-[#0E0F13] text-[#EAECEF] font-sans flex">
-      
-      {/* SIDEBAR - Pass state down if needed, but here we use the CSS logic */}
       <Sidebar onCollapse={setIsSidebarCollapsed} />
 
-      {/* MAIN CONTENT 
-          Logic: 
-          - On Mobile: pl-0 (Sidebar is an overlay)
-          - On Desktop: transition padding based on Sidebar width
-      */}
       <div className={`flex-1 transition-all duration-300 flex flex-col min-h-screen w-full
         ${isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64"} pl-0`}>
 
-        {/* NAV: Responsive stacking */}
+        {/* NAV */}
         <nav className="border-b border-slate-800 bg-[#17181E] px-4 md:px-8 py-6 sticky top-0 z-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h1 className="text-xl md:text-2xl font-black text-white uppercase truncate mt-12 md:mt-0">
+          <h1 className="text-xl md:text-2xl font-black text-white uppercase truncate mt-12 ml-15 md:mt-0">
             {task.title}
           </h1>
 
@@ -115,7 +138,7 @@ const TaskDetail = () => {
         </nav>
 
         {/* MAIN BODY */}
-        <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 flex-grow w-full">
+        <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12 grow w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
 
             {/* LEFT SIDE */}
@@ -139,19 +162,78 @@ const TaskDetail = () => {
                     <p className="text-[#F7A600] font-bold">{task.priority}</p>
                   </div>
                   <div className="flex gap-2 w-full sm:w-auto">
-                    <button className="flex-1 sm:px-8 py-2 bg-[#F7A600] rounded font-bold text-black">Start</button>
-                    <button className="flex-1 sm:px-8 py-2 bg-slate-800 rounded font-bold text-white">Stop</button>
+                    <button 
+                      onClick={handleStart}  
+                      disabled={task.isRunning} 
+                      className={`flex-1 sm:px-8 py-2 rounded font-bold text-black transition-all ${task.isRunning ? "bg-slate-700 cursor-not-allowed" : "bg-[#F7A600] hover:scale-105"}`}
+                    >
+                      Start
+                    </button>
+                    <button 
+                      onClick={handleStop} 
+                      disabled={!task.isRunning} 
+                      className={`flex-1 sm:px-8 py-2 rounded font-bold transition-all ${!task.isRunning ? "bg-slate-900 text-slate-600 cursor-not-allowed" : "bg-slate-800 text-white hover:bg-slate-700"}`}
+                    >
+                      Stop
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* PROGRESS */}
-              <div className="bg-[#17181E] border border-slate-800 p-6 md:p-8 rounded-2xl">
-                <p className="text-slate-500 text-xs font-bold uppercase mb-4">Progress Status</p>
-                <div className="bg-slate-900 rounded-full h-3 w-full overflow-hidden">
-                  <div className="h-full bg-green-600 transition-all duration-500" style={{ width: `${progress}%` }}></div>
+              {/* 3D CIRCULAR PROGRESS SECTION */}
+              <div className="bg-[#17181E] border border-slate-800 p-8 rounded-2xl flex flex-col items-center justify-center shadow-2xl relative overflow-hidden">
+                <div className="w-full flex justify-between items-center mb-6">
+                  <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Work_Progress_Engine</p>
+                  <span className="text-[#F7A600] font-mono text-xs font-bold">{progress}%</span>
                 </div>
-                <p className="mt-2 text-sm font-bold text-white">{progress}% Completed</p>
+
+                <div className="relative flex items-center justify-center w-48 h-48 md:w-64 md:h-64">
+                  {/* SVG Container with ViewBox for perfect responsiveness */}
+                  <svg viewBox="0 0 224 224" className="w-full h-full transform -rotate-90">
+                    {/* Layer 1: Inset Track */}
+                    <circle cx="112" cy="112" r="90" stroke="#0E0F13" strokeWidth="15" fill="transparent" />
+                    
+                    {/* Layer 2: 3D Glow (Blurred background) */}
+                    <circle 
+                      cx="112" cy="112" r="90" 
+                      stroke={task.isRunning ? "#F7A600" : "#22c55e"} 
+                      strokeWidth="15" fill="transparent" 
+                      strokeDasharray={strokeDasharray} 
+                      strokeDashoffset={strokeDashoffset} 
+                      strokeLinecap="round"
+                      className="transition-all duration-1000 ease-linear opacity-30 blur-[8px]" 
+                    />
+
+                    {/* Layer 3: Sharp 3D Line */}
+                    <circle 
+                      cx="112" cy="112" r="90" 
+                      stroke={task.isRunning ? "#F7A600" : "#22c55e"} 
+                      strokeWidth="10" fill="transparent" 
+                      strokeDasharray={strokeDasharray} 
+                      strokeDashoffset={strokeDashoffset} 
+                      strokeLinecap="round"
+                      className="transition-all duration-1000 ease-linear drop-shadow-[0_0_8px_rgba(247,166,0,0.6)]" 
+                    />
+                  </svg>
+
+                  {/* Center Content (The Hub) */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <div className="bg-[#0E0F13] w-[70%] h-[70%] rounded-full border border-slate-800 shadow-[inset_0_4px_20px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center">
+                      <h2 className="text-3xl md:text-4xl font-black text-green-600 font-mono tracking-tighter">
+                        {Math.floor(progress)}<span className="text-green-600 text-lg"> %</span>
+                      </h2>
+                      <p className={`text-[8px] font-bold uppercase tracking-widest mt-1 ${task.isRunning ? 'text-[#F7A600] animate-pulse' : 'text-slate-500'}`}>
+                        {task.isRunning ? 'Streaming' : 'Standby'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 w-full border-t border-slate-800 pt-4 text-center">
+                   <p className="text-[9px] font-mono text-slate-500 uppercase tracking-widest">
+                    {task.isRunning ? ">>> System Active: Logging Work Hours" : ">>> System Idle: Task Session Paused"}
+                  </p>
+                </div>
               </div>
 
               {/* DESCRIPTION */}
@@ -164,7 +246,7 @@ const TaskDetail = () => {
               </div>
             </div>
 
-            {/* RIGHT SIDE */}
+            {/* RIGHT SIDE (Metadata) */}
             <div className="lg:col-span-4 space-y-6">
               <div className="bg-[#17181E] border border-slate-800 p-6 rounded-2xl">
                 <div className="space-y-4">

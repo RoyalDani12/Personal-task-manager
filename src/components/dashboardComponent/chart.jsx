@@ -18,7 +18,7 @@ const TaskDistributionChart = ({ completed, active, pending }) => {
       <div className="flex flex-col md:flex-row items-center justify-between gap-8">
         
         {/* Left Side: The Chart */}
-        <div className="relative w-full md:w-1/2 h-[280px]">
+        <div className="relative w-full md:w-1/2 h-70">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
