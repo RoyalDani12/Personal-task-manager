@@ -1,181 +1,174 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import registerUserAPI from '../api/authApi'
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import registerUserAPI from "../api/authApi";
 
 const Register = () => {
+  const navigate = useNavigate();
 
-  const [data ,setData ] = useState({
-    name:"",
-    email:"",
-    phone:"",
-    password:"",
-    confirmPassword:"",
-  })
+  const [success, setSuccess] = useState();
+  const [error, setError] = useState("");
 
-  const [ showPassword,setShowPassword] = useState(false)
-  const [ showConfirm ,setConfirmPassword] = useState(false)
+  const [data, setData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+  });
 
-  const [err,setErr] = useState('')
-  const [success,setSccess ] = useState('')
-  const [ loading ,setLoading ] = useState(false)
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+  };
 
-  const handleChange=(e)=>{
-    const { name,value } = e.target
-     setData({...data,[name]:value})
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  const handleSubmit=async(e)=>{
-    e.preventDefault()
-    setLoading(true)
+    console.log(data);
+    const register = async () => {
       try {
-        const response = await registerUserAPI(data)
-         setSccess(response.data.message || " user register succefully")
+        setError("");
+        const response = await registerUserAPI(data);
+        setSuccess(
+          response.data.message || "Login Successfully You Can Login Now ",
+        );
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
       } catch (error) {
-        const errorMsg = error.response.data.message || 'Something went wrong'
-        setErr(errorMsg)
-        console.log(errorMsg);
-      }finally{
-         setLoading(false)
+        if (error.response.data.message) {
+          setError(error.response.data.message);
+          console.log(error.response.data.message);
+        } else setError("Some thing went wrong...");
       }
-  }
+    };
+
+    register();
+  };
 
   return (
+    <div className="min-h-screen bg-[#0E0F13] text-indigo-500 flex flex-col font-sans">
+      <Navbar />
 
-    <div className="min-h-screen flex flex-col bg-slate-950 text-white">
-
-      <Navbar/>
-
-      <div className="flex flex-1 items-center justify-center px-6 py-16">
-
-        <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-xl p-10">
-
-          { err && (
-            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg mb-4 text-sm">
-              {err}
-            </div>
-          )}
-
-          { success && (
-            <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-3 rounded-lg mb-4 text-sm">
-              {success}
-            </div>
-          )}
+      <div className="flex flex-1 items-center justify-center px-6 py-12 animation-float">
+        <div className="w-full max-w-md bg-slate-900 border border-slate-800/60 rounded-xl shadow-2xl p-10 relative overflow-hidden animate-float">
+          {/* TITLE */}
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-indigo-600">Register</h2>
+            {success && (
+              <div className="bg-[#00B464]/10 border border-[#00B464]/30 text-[#00B464] px-4 py-3 rounded-xl text-xs font-bold text-center animate-pulse">
+                {success}
+              </div>
+            )}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-4 rounded-xl text-xs font-bold text-center animate-pulse">
+                {error}
+              </div>
+            )}
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-
-            <div className="text-center mb-4">
-              <h1 className="text-3xl font-bold">Sign Up</h1>
-              <p className="text-slate-400 text-sm mt-1">Create your account</p>
+            {/* USERNAME */}
+            <div className="space-y-2">
+              <label className="text-[13px] font-black text-indigo-500 ml-1">
+                Username
+              </label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter username"
+                value={data.name}
+                onChange={handleChange}
+                className="w-full bg-[#0E0F13] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-600 transition-all placeholder:text-slate-400 font-mono"
+              />
             </div>
 
-            <input
-              type="text"
-              name='name'
-              value={data.name}
-              placeholder='Enter Name'
-              onChange={handleChange}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition"
-            />
-
-            <input
-              type="email"
-              name='email'
-              value={data.email}
-              placeholder='Enter Email'
-              onChange={handleChange}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition"
-            />
-
-            <input
-              type="tel"
-              name='phone'
-              value={data.phone}
-              placeholder='Enter Name'
-              onChange={handleChange}
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition"
-            />
-
-            {/* Password */}
-
-            <div className="relative">
-
+            {/* EMAIL */}
+            <div className="space-y-2">
+              <label className="text-[13px] font-black text-indigo-500 ml-1">
+                Email
+              </label>
               <input
-                type={showPassword ? "text":"password"}
-                name='password'
+                type="email"
+                name="email"
+                placeholder="name@domain.com"
+                value={data.email}
+                onChange={handleChange}
+                className="w-full bg-[#0E0F13] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-600 transition-all placeholder:text-slate-400 font-mono"
+              />
+            </div>
+            {/* EMAIL */}
+            <div className="space-y-2">
+              <label className="text-[13px] font-black text-indigo-500 ml-1">
+                Phone
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Enter phone number"
+                value={data.phone}
+                onChange={handleChange}
+                className="w-full bg-[#0E0F13] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-600 transition-all placeholder:text-slate-400 font-mono"
+              />
+            </div>
+
+            {/* PASSWORD */}
+            <div className="space-y-2">
+              <label className="text-[13px] font-black text-indigo-500 ml-1">
+                Password
+              </label>
+              <input
+                type="password"
+                name="password"
+                placeholder="••••••••"
                 value={data.password}
-                placeholder='Enter Password'
                 onChange={handleChange}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-[#0E0F13] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-600 transition-all placeholder:text-slate-400 font-mono"
               />
-
-              <button
-                type='button'
-                onClick={()=>setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-              >
-                <FontAwesomeIcon icon={showPassword ?faEyeSlash : faEye}/>
-              </button>
-
             </div>
 
-            {/* Confirm Password */}
-
-            <div className="relative">
-
+            {/* CONFIRM PASSWORD */}
+            <div className="space-y-2">
+              <label className="text-[13px] font-black text-indigo-500 ml-1">
+                Confirm Password
+              </label>
               <input
-                type={showConfirm ?"text" :"password"}
-                name='confirmPassword'
+                type="password"
+                name="confirmPassword"
+                placeholder="••••••••"
                 value={data.confirmPassword}
-                placeholder='Confirm Password'
                 onChange={handleChange}
-                className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 pr-12 focus:outline-none focus:border-indigo-500 transition"
+                className="w-full bg-[#0E0F13] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-600 transition-all placeholder:text-slate-400 font-mono"
               />
-
-              <button
-                type='button'
-                onClick={()=>setConfirmPassword(!showConfirm)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-              >
-                <FontAwesomeIcon icon={showConfirm ? faEyeSlash : faEye}/>
-              </button>
-
             </div>
 
-            {/* Terms */}
-
-            <div className="flex items-center gap-2 text-sm text-slate-400">
-              <input type="checkbox" className="accent-indigo-500"/>
-              <label>Agree to the Terms and Policys</label>
-            </div>
-
+            {/* REGISTER BUTTON */}
             <button
-              type='submit'
-              className="w-full bg-indigo-600 hover:bg-indigo-500 transition py-3 rounded-lg font-semibold"
+              type="submit"
+              className="w-full bg-indigo-600 hover:bg-green-500 cursor-pointer text-white py-4 rounded-xl font-black transition-all active:scale-[0.98]"
             >
-              {loading ? "Registering..." : "Register"}
+              Register
             </button>
 
-            <p className="text-center text-slate-400 text-sm">
-              Alerady has one?
-              <Link to={'/login'} className="text-indigo-400 hover:text-indigo-300 ml-1">
+            {/* LOGIN LINK */}
+            <p className="text-center text-indigo-500 text-[13px] font-bold pt-4">
+              Already have an account?
+              <Link
+                to="/login"
+                className="ml-2 hover:text-green-600 transition-colors"
+              >
                 Login
               </Link>
             </p>
-
           </form>
-
         </div>
-
       </div>
 
-      <Footer/>
-
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

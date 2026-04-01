@@ -7,7 +7,7 @@ const response = await taskUseCase(taskRepository,req.user.id,req.body)
 
 res.status(201).json({
   success:true,
-  mesaage:"Task created Successfully",
+  message:"Task created Successfully",
   data:response
 })
 

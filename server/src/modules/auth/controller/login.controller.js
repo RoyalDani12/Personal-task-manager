@@ -39,7 +39,7 @@ const loginController = expressAsyncHandler( async(req,res)=>{
   res.status(201).json({
     sucess:true,
     message:'Login Successfully',
-    data:result,
+    result,
     accessToken
   })
 })

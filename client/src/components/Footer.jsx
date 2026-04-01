@@ -10,14 +10,14 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-8 py-16 grid grid-cols-1 md:grid-cols-12 gap-12">
         <div className="md:col-span-4 space-y-6">
           <div className="flex items-center gap-2">
-            <div className="bg-[#F7A600] text-black font-black px-1.5 py-0.5 rounded-sm text-sm">BY</div>
-            <h2 className="text-xl font-black text-white uppercase tracking-tighter">DaniRoyal<span className="text-[#F7A600]">.</span></h2>
+            <div className="bg-green-600 text-black font-black px-1.5 py-0.5 rounded-sm text-sm">BY</div>
+            <h2 className="text-xl font-black text-indigo-500 ">DaniRoyal<span className="text-[#F7A600]">.</span></h2>
           </div>
           <p className="text-sm leading-relaxed text-slate-500 max-w-xs">High-performance personal task management engine. Engineered for efficiency.</p>
         </div>
 
         <div className="md:col-span-3">
-          <h3 className="text-xs font-black text-white mb-6 uppercase tracking-[0.2em]">Platform</h3>
+          <h3 className=" font-black text-indigo-500 mb-6 text-xl">Platform</h3>
           <nav className="flex flex-col gap-4 text-sm font-semibold">
             {['Login', 'Register', 'Tasks', 'Profile'].map(link => (
               <Link key={link} to={`/${link.toLowerCase()}`} className="hover:text-[#F7A600] transition-colors">{link}</Link>
@@ -27,8 +27,8 @@ const Footer = () => {
 
         <div className="md:col-span-5 space-y-8">
           <div>
-            <h3 className="text-xs font-black text-white mb-6 uppercase tracking-[0.2em]">Collaboration</h3>
-            <a href="mailto:daniray@example.com" className="inline-flex items-center gap-2 bg-[#F7A600] px-8 py-3 rounded-md text-black text-xs font-black uppercase tracking-widest hover:bg-[#ffb700] transition-all"><FontAwesomeIcon icon={faEnvelope} />Hire Me</a>
+            <h3 className="text-xl font-black text-indigo-500 mb-6 ">Collaboration</h3>
+            <a href="mailto:daniray@example.com" className="inline-flex items-center gap-2 bg-indigo-600 px-8 py-3 rounded-md text-black text-xs font-black hover:bg-indigo-500 transition-all"><FontAwesomeIcon icon={faEnvelope} />Hire Me</a>
           </div>
           <div className="flex gap-3">
             {[faLinkedin, faTelegram, faGithub, faInstagram].map((icon, i) => (

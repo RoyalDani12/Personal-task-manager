@@ -2,7 +2,7 @@ import React from "react";
 
 const TaskCard = ({ item, onDelete }) => {
   return (
-    <div className="bg-[#17181E]/60 backdrop-blur-md border border-slate-800 rounded-xl p-6 h-full flex flex-col transition-all duration-300 hover:border-[#F7A600]/40 hover:bg-[#1C1E24] hover:-translate-y-1.5 hover:shadow-[0_12px_30px_rgba(0,0,0,0.4)] group">
+    <div className="bg-bg-[#2e56d0] backdrop-blur-md border border-slate-800 rounded-xl p-6 h-full flex flex-col transition-all duration-300 hover:border-[#F7A600]/40 hover:bg-[#2e56d0] hover:-translate-y-1.5 hover:shadow-[0_12px_30px_rgba(0,0,0,0.4)] group">
       
       {/* Header: Priority + Status */}
       <div className="flex justify-between items-center mb-5">

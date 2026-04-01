@@ -1,43 +1,135 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCheckCircle,
+  faTasks,
+  faClock,
+  faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
+
+import { Link } from "react-router-dom";
+
+const slides = [
+  {
+    img: "https://images.pexels.com/photos/7163362/pexels-photo-7163362.jpeg",
+    title: "Organize Your Tasks",
+    description: "Manage your daily tasks efficiently and stay productive.",
+    icon: faTasks,
+  },
+  {
+    img: "https://images.pexels.com/photos/7668396/pexels-photo-7668396.jpeg",
+    title: "Track Your Progress",
+    description: "Monitor completed tasks and improve your workflow.",
+    icon: faCheckCircle,
+  },
+  {
+    img: "https://images.pexels.com/photos/35719571/pexels-photo-35719571.jpeg",
+    title: "Save Your Time",
+    description: "Plan smarter and achieve more in less time.",
+    icon: faClock,
+  },
+];
 
 const Hero = () => {
+  const [progress, setProgress] = useState(0);
+
+  const handleSlideChange = () => {
+    setProgress(0);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 0 : prev + 1));
+    }, 30);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="bg-gray-100 dark:bg-gray-950 min-h-screen flex items-center transition-colors duration-300">
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
+    <section className="w-full min-h-[80vh] md:min-h-[75vh] flex items-center bg-slate-950">
+      <Swiper
+        slidesPerView={1}
+        loop
+        modules={[Autoplay]}
+        autoplay={{ delay: 7000 }}
+        onSlideChange={handleSlideChange}
+      >
+        {slides.map((slide, index) => (
+          <SwiperSlide key={index}>
+            <div className="grid md:grid-cols-2 gap-8 items-center px-6 md:px-16 py-10">
 
-        <div>
-          <h1 className="text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-            Organize Your Tasks <br /> And Boost Productivity
-          </h1>
+              {/* LEFT CONTENT */}
+              <div className="text-white animation-float"> 
+                <div className="mb-4 text-indigo-400 text-3xl">
+                  <FontAwesomeIcon icon={slide.icon} />
+                </div>
 
-          <p className="mt-6 text-lg text-gray-700 dark:text-gray-300">
-            Manage your daily tasks, track your progress, and stay productive
-            with our simple and powerful task management system.
-          </p>
+                <h1 className="text-3xl md:text-6xl font-extrabold leading-tight mb-4">
+                  {slide.title}
+                </h1>
 
-          <div className="mt-8 flex gap-4">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition shadow-lg">
-              Get Started
-            </button>
+                <p className="text-slate-300 text-sm md:text-lg mb-6 max-w-lg">
+                  {slide.description}
+                </p>
 
-            <button className="border border-gray-400 dark:border-gray-600 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-800 transition">
-              Learn More
-            </button>
-          </div>
-        </div>
+                <div className="flex gap-4 flex-wrap">
+                  <Link
+                    to="/register"
+                    className="bg-indigo-600 px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all"
+                  >
+                    Get Started
+                    <FontAwesomeIcon icon={faArrowRight} />
+                  </Link>
 
-        <div className="relative">
-          {/* Glow background */}
-          <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full pointer-events-none"></div>
-          {/* Image */}
-          <img
-            src="https://illustrations.popsy.co/gray/work-from-home.svg"
-            alt="task management"
-            className="w-full relative z-10"
-          />
-        </div>
+                  <button className="border border-white/30 px-6 py-3 rounded-full hover:bg-white hover:text-black transition-all"> <Link to={'/login'}>View Tasks</Link>
+                    
+                  </button>
+                </div>
 
-      </div>
+                {/* Stats */}
+                <div className="flex gap-8 mt-8 text-sm text-slate-400">
+                  <div>
+                    <p className="text-white font-bold text-lg">1K+</p>
+                    Tasks
+                  </div>
+                  <div>
+                    <p className="text-white font-bold text-lg">500+</p>
+                    Users
+                  </div>
+                  <div>
+                    <p className="text-white font-bold text-lg">99%</p>
+                    Efficiency
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT IMAGE */}
+              <div className="relative w-full h-[250px] md:h-[400px] rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src={slide.img}
+                  alt=""
+                  className="w-full h-full object-cover rounded-2xl transform hover:scale-105 transition duration-700"
+                />
+
+                {/* overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+
+                {/* progress bar */}
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-700">
+                  <div
+                    className="h-1 bg-indigo-500"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </section>
   );
 };
