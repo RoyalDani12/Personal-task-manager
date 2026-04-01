@@ -3,6 +3,7 @@ import express from 'express'
  import registerController from './controller/register.controller.js'
  import loginController from './controller/login.controller.js'
  import refreshController from './controller/refresh.controller.js'
+ import googleLoginController from './controller/google.login.controller.js'
 
 
 
@@ -10,8 +11,8 @@ import express from 'express'
  router.post('/register',registerController)
  router.post('/login',loginController)
  router.post('/refresh-token',refreshController)
+ router.post('/google-login',googleLoginController)
 
  
-// remmber  you don't save to the local storage and database refresh token 
 
  export default router

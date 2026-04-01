@@ -21,49 +21,48 @@ const taskSchema = new mongoose.Schema(
       enum: ["low", "medium", "high"],
       default: "medium",
     },
-    difficulityLevel: {
-      type:String,
-      enum:['easy','meddium','hard'],
-      default:'meddium'
+    difficultyLevel: { 
+      type: String,
+      enum: ["easy", "medium", "hard"],
+      default: "medium",
     },
-    assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // reference to the user collection
+    required_time: {
+      type: Number, // total required time in minutes
+      required: true,
     },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // who created the task
       required: true,
     },
     startedDate: {
-      type:Date
+      type: Date,
+      required: true,
     },
     dueDate: {
       type: Date,
-    },  
-    sessions :[
-      {
-        startTime:Date,
-        endTime:Date
-      }
-    ] ,
-    totalWorkedTime:{
-      type:Number,// milliseconds
-      default:0
-    }  ,
-    isRunning:{
-      type:Boolean,
-      default:false
-    },   //   add when it should be  started
-     //  how can identify the system  the user is active of not active
-    isActive: {
-      type: Boolean,
-      default: true,
+      required: true,
     },
+    sessions: [
+      {
+        startTime: Date,
+        endTime: Date,
+      },
+    ],
+    totalWorkedTime: {
+      type: Number, // milliseconds
+      default: 0,
+    },
+    isRunning: {
+      type: Boolean,
+      default: false,
+    }, //   add when it should be  started
+    //  how can identify the system  the user is active of not
   },
   {
     timestamps: true, // adds createdAt and updatedAt
-  }
+  },
 );
 
 const Task = mongoose.model("Task", taskSchema);

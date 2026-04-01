@@ -12,7 +12,6 @@ const UpdateTask = () => {
   const [taskData, setTaskData] = useState({
     title: "",
     description: "",
-    status: "",
     priority: "",
     difficulty: "",
     startDate: "",
@@ -94,14 +93,7 @@ const UpdateTask = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className={labelStyle}>current status:</label>
-              <select name="status" value={taskData.status} onChange={handleChange} className={inputStyle}>
-                <option value="pending">pending</option>
-                <option value="in-progress">in-progress</option>
-                <option value="completed">completed</option>
-              </select>
-            </div>
+
             <div>
               <label className={labelStyle}>priority val:</label>
               <select name="priority" value={taskData.priority} onChange={handleChange} className={inputStyle}>
