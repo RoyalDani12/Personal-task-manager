@@ -4,12 +4,15 @@ import express from 'express'
  import loginController from './controller/login.controller.js'
  import refreshController from './controller/refresh.controller.js'
  import googleLoginController from './controller/google.login.controller.js'
+ import { loginValidator } from './validators/login.validator.js'
+ import { registerValidator } from './validators/register.validator.js'
+ 
 
 
 
  //login and register router
- router.post('/register',registerController)
- router.post('/login',loginController)
+ router.post('/register',registerValidator,registerController)
+ router.post('/login',loginValidator,loginController)
  router.post('/refresh-token',refreshController)
  router.post('/google-login',googleLoginController)
 

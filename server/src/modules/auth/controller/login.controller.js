@@ -23,7 +23,7 @@ const loginController = expressAsyncHandler( async(req,res)=>{
   })
 
 
-   // save rfresh token to the cookie
+   // save refresh token to the cookie
    res.cookie('refreshToken',refreshToken,{
     httpOnly:true,
     sameSite:"strict",
@@ -37,7 +37,7 @@ const loginController = expressAsyncHandler( async(req,res)=>{
 
 
   res.status(201).json({
-    sucess:true,
+    success:true,
     message:'Login Successfully',
     result,
     accessToken

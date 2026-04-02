@@ -29,6 +29,7 @@ const token = body?.IdToken || body?.idToken || body?.token
      
     const userData = {
       name,
+      phone:"0937044312",
       email,
       password:Math.random().toString(36).slice(-10)
     }
