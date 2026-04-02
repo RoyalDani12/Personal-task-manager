@@ -1,90 +1,102 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEye, faEyeSlash, faShieldHalved } from '@fortawesome/free-solid-svg-icons'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import { loginAPI } from '../api/authApi'
-import { GoogleLogin } from '@react-oauth/google'
-import { googleLoginAPI } from '../api/google.login.api'
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faEyeSlash,
+  faShieldHalved,
+} from "@fortawesome/free-solid-svg-icons";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import { loginAPI } from "../api/authApi";
+import { GoogleLogin } from "@react-oauth/google";
+import { googleLoginAPI } from "../api/google.login.api";
+import { loginSchema } from "../validators/login.validator";
 
 const Login = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [data, setData] = useState({
     email: "",
-    password: ""
-  })
+    password: "",
+  });
 
-  const [showPassword, setShowPassword] = useState(false)
-  const [err, setErr] = useState("")
-  const [success, setSuccess] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [err, setErr] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    setData({ ...data, [name]: value })
-    if (err) setErr("") // Clear error when user types
-  }
+    const { name, value } = e.target;
+    setData({ ...data, [name]: value });
+    if (err) setErr(""); // Clear error when user types
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
+    setErr("");
+    const { error } = loginSchema.validate(data, {
+      abortEarly: false,
+      errors: {
+        wrap: {
+          label: "",
+        },
+      },
+    });
+
+    if (error) {
+      setErr(error.message);
+      setIsLoading(false);
+      console.log(err);
+      return;
+    }
 
     try {
-      const response = await loginAPI(data)
-      setSuccess("Login Successfully. Redirecting...")
-        const userData = response.data
-        console.log(userData);
-      localStorage.setItem('accessToken', response.data.accessToken)
-      localStorage.setItem('user', JSON.stringify(userData))
+      const response = await loginAPI(data);
+      setSuccess("Login Successfully. Redirecting...");
+      const userData = response.data;
+      console.log(userData);
+      localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("user", JSON.stringify(userData));
 
       setTimeout(() => {
-        navigate('/dashboard')
-      }, 1500)
+        navigate("/dashboard");
+      }, 1500);
     } catch (error) {
-      setErr(error.response?.data?.message || "Authentication failed")
-      console.log(error.message)
+      setErr(error.response?.data?.message || "Authentication failed");
+      console.log(error.message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // handle Google login
-  const handleGoogleLogin=async(credentialResponse)=>{
+  const handleGoogleLogin = async (credentialResponse) => {
     try {
-     const token = credentialResponse.credential
-     const response = await googleLoginAPI(token)
-    setSuccess("Google login successfully")
+      const token = credentialResponse.credential;
+      const response = await googleLoginAPI(token);
+      setSuccess("Google login successfully");
 
+      localStorage.setItem("accessToken", response.data.accessToken);
+      localStorage.setItem("user", JSON.stringify(response.data));
 
-
-     localStorage.setItem("accessToken",response.data.accessToken)
-     localStorage.setItem("user",JSON.stringify(response.data))
-
-     setTimeout(() => {
-    navigate('/dashboard')
-      }, 1500)
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
     } catch (error) {
-      console.error("google auth error")
+      console.error("google auth error");
     }
-
-  }
+  };
 
   return (
     <div className="min-h-screen bg-[#0E0F13] text-indigo-500 flex flex-col font-sans">
       <Navbar />
 
       <div className="flex flex-1 items-center justify-center px-6 py-12 ">
-        
         <div className="w-full max-w-md border border-slate-800/60 rounded-xl shadow-2xl p-10 relative overflow-hidden animation-float  bg-slate-900 ">
-          
-
           <div className="text-center mb-10 ">
-       
-            <h2 className="text-3xl font-bold text-indigo-600 ">
-               Login
-            </h2>
+            <h2 className="text-3xl font-bold text-indigo-600 ">Login</h2>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5 ">
@@ -112,7 +124,12 @@ const Login = () => {
                 placeholder="name@domain.com"
                 value={data.email}
                 onChange={handleChange}
-                className="w-full bg-[#0E0F13] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-600 transition-all placeholder:text-slate-400 font-mono"
+                className={`w-full bg-[#0E0F13] border rounded-xl px-4 py-3 text-sm focus:outline-none transition-all placeholder:text-slate-400 font-mono 
+                  //  for the error
+                   ${err.toLowerCase().includes("email") 
+                   ? "border-red-500 focus:border-red-500"
+                   : "border-slate-800 focus:border-green-600 "
+                   }`}
               />
             </div>
 
@@ -173,9 +190,9 @@ const Login = () => {
 
             {/* REGISTER LINK */}
             <p className="text-center text-indigo-500 text-[13px] font-bold  pt-4">
-              Don't have Account ? 
+              Don't have Account ?
               <Link
-                to={'/register'}
+                to={"/register"}
                 className="text-indigo-500 hover:text-blue-600 ml-2 transition-colors"
               >
                 Create One
@@ -187,7 +204,7 @@ const Login = () => {
 
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

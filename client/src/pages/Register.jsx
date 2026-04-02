@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import registerUserAPI from "../api/authApi";
+import { registerSchema } from "../validators/register.validator";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -25,8 +26,21 @@ const Register = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log(data);
+      // validation
+      const { error } = registerSchema.validate(data,{
+        abortEarly:false,
+        errors:{
+          wrap:{
+            label:" "
+          }
+        }
+      })  
+       console.log(error.details)
+        if( error ){
+          setError(error.details.map(err=>err.message))
+          console.log(error);
+          return
+        }
     const register = async () => {
       try {
         setError("");
@@ -62,11 +76,11 @@ const Register = () => {
                 {success}
               </div>
             )}
-            {error && (
+{/*             {error && (
               <div className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-4 rounded-xl text-xs font-bold text-center animate-pulse">
                 {error}
               </div>
-            )}
+            )} */}
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -119,13 +133,17 @@ const Register = () => {
               <label className="text-[13px] font-black text-indigo-500 ml-1">
                 Password
               </label>
+               { error && <p>{error.password}</p>}
               <input
                 type="password"
                 name="password"
                 placeholder="••••••••"
                 value={data.password}
                 onChange={handleChange}
-                className="w-full bg-[#0E0F13] border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-600 transition-all placeholder:text-slate-400 font-mono"
+                className={`w-full bg-[#0E0F13] border  rounded-xl px-4 py-3 text-sm focus:outline-none  transition-all placeholder:text-slate-400 font-mono  ${ error 
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-slate-900 focus:border-green-600"
+                }`}
               />
             </div>
 
