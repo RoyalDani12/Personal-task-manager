@@ -52,7 +52,8 @@ Supports **Google Login**, secure **JWT authentication with refresh tokens**, an
 ## 📸 Screenshots
 
 ### 🖥️ Dashboard
-![Dashboard](https://github.com/user-attachments/assets/a780d3c9-aaf0-4d82-8076-c39b5dc69eef)
+<img width="1910" height="967" alt="task_updated dashboard" src="https://github.com/user-attachments/assets/35e59243-07e2-440f-ad83-932723d0106e" />
+
 
 ### 📋 Task Management
 ![Tasks](https://github.com/user-attachments/assets/e3fc74c6-2ed7-42de-996c-8253d11a6509)
