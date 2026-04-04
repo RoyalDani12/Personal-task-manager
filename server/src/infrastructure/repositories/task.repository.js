@@ -24,7 +24,12 @@ const taskRepository = {
 
   async taskDetail(taskId,userId){
      return await Task.findOne({_id:taskId,createdBy:userId})
-  }
+  },
+
+  // infrastructure/repositories/task.repository.js
+async getAllRunningTasks() {
+  return await Task.find({ isRunning: true });
+}
 
 }
 

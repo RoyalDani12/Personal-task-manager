@@ -1,46 +1,46 @@
-
-export const stopTaskUseCase=async(taskId,userId,taskRepository)=>{
-
-  if(!taskId || !userId){
-    throw new Error("Task or User Id Messing")
+export const stopTaskUseCase = async (taskId, userId, taskRepository) => {
+  // 1. Validation
+  if (!taskId || !userId) {
+    throw new Error("Task ID or User ID is missing");
   }
 
-  // check the task is found in the DB
+  const foundTask = await taskRepository.taskDetail(taskId, userId);
 
-  const foundTask = await taskRepository.taskDetail(taskId,userId)
-
-  if(!foundTask){
-    const error = new Error(" task not found")
-     error.statusCode = 404
-    throw error
+  if (!foundTask) {
+    const error = new Error("Task not found");
+    error.statusCode = 404;
+    throw error;
   }
-   if(!foundTask.isRunning){
-    throw new Error("task is not running")
-   }
 
-   
-   // get the last session
-   const sessions = foundTask.sessions
-   if(sessions.length === 0){
-    throw new Error("No active Session Found to Stop")
-   }
-   const lastSession = sessions[ sessions.length - 1]
-   
-   // set end time
-   lastSession.endTime = new Date();
+  if (!foundTask.isRunning) {
+    throw new Error("Task is not currently running");
+  }
 
-   // calculate the total work time
-    const workedTime = lastSession.endTime - lastSession.startTime
+  // 2. Identify and Close Session
+  const lastSession = foundTask.sessions[foundTask.sessions.length - 1];
+  
+  if (!lastSession || !lastSession.startTime) {
+    throw new Error("No active session start time found");
+  }
 
-    // update the total time
-    foundTask.totalWorkedTime = foundTask.totalWorkedTime + workedTime
+  lastSession.endTime = new Date();
 
-    // stop running
-    foundTask.isRunning = false
+  // 3. Precise Math
+  const sessionDuration = lastSession.endTime.getTime() - new Date(lastSession.startTime).getTime();
+  
+  // Ensure we are adding numbers, not undefined
+  foundTask.totalWorkedTime = (foundTask.totalWorkedTime || 0) + sessionDuration;
+  foundTask.isRunning = false;
 
-    
- const updatedTask = await taskRepository.updateTask(taskId,userId,foundTask)
+  // 4. THE COMPLETION CHECK (Add this!)
+  // required_time is in minutes -> convert to milliseconds
+  const requiredMs = foundTask.required_time * 60 * 1000;
 
- return updatedTask
+  if (foundTask.totalWorkedTime >= requiredMs) {
+    foundTask.status = "completed";
+  }
 
-}
+  // 5. Final Save
+  const updatedTask = await taskRepository.updateTask(taskId, userId, foundTask);
+  return updatedTask;
+};
