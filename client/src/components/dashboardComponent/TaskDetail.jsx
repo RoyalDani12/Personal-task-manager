@@ -11,7 +11,6 @@ import getTaskDetailApi from "../../api/task.Detail.Api";
 import deleteTask from "../../api/delete.task.Api";
 import Footer from "../Footer";
 import Sidebar from "./Sidebar";
-import { calculateProgress } from "../../utils/progress.utils";
 import { formatDate, calculateTimeLeft } from "../../utils/time.utils";
 import { startTaskApi } from "../../api/start.task.api";
 import { stopTaskApi } from "../../api/stop.task.api";
@@ -27,6 +26,35 @@ const TaskDetail = () => {
 
   const strokeDasharray = 565.48; 
   const strokeDashoffset = strokeDasharray - (progress / 100) * strokeDasharray;
+
+  // --- 1. PROGRESS CALCULATION LOGIC ---
+  const calculateLiveProgress = (currentTask) => {
+    if (!currentTask || !currentTask.required_time) return 0;
+
+    const totalRequiredMs = currentTask.required_time * 60 * 1000;
+    let totalWorkedMs = currentTask.totalWorkedTime || 0;
+
+    if (currentTask.isRunning && currentTask.sessions?.length > 0) {
+      const lastSession = currentTask.sessions[currentTask.sessions.length - 1];
+      if (lastSession.startTime && !lastSession.endTime) {
+        const liveSessionDuration = new Date().getTime() - new Date(lastSession.startTime).getTime();
+        totalWorkedMs += liveSessionDuration;
+      }
+    }
+
+    let percent = (totalWorkedMs / totalRequiredMs) * 100;
+    return Math.min(Math.max(percent, 0), 100).toFixed(2); 
+  };
+
+  // --- 2. LIVE STATUS LOGIC ---
+  const isExpired = task && new Date() > new Date(task.dueDate) && task.status !== "completed";
+
+  const getStatusDisplay = () => {
+    if (!task) return { text: "UNKNOWN", color: "text-gray-400 bg-gray-50" };
+    if (task.status === "completed") return { text: "COMPLETED", color: "text-green-600 bg-green-50 border-green-200" };
+    if (isExpired) return { text: "EXPIRED", color: "text-red-600 bg-red-50 border-red-200" };
+    return { text: task.status.toUpperCase(), color: "text-blue-600 bg-blue-50 border-blue-200" };
+  };
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -48,16 +76,15 @@ const TaskDetail = () => {
     if (!task) return;
     const updateUI = () => {
       setTimeLeft(calculateTimeLeft(task));  
-      setProgress(calculateProgress(task));   
+      setProgress(calculateLiveProgress(task)); 
     };
     updateUI();
-    const timer = setInterval(updateUI, 1000);
+    const timer = setInterval(updateUI, 1000); 
     return () => clearInterval(timer);
   }, [task]);
 
   const handleDelete = async (taskId) => {
-    const confirm = window.confirm("System Warning: Permanent deletion requested. Proceed?");
-    if (!confirm) return;
+    if (!window.confirm("Permanent deletion requested. Proceed?")) return;
     try {
       await deleteTask(taskId);
       navigate("/dashboard");
@@ -71,10 +98,9 @@ const TaskDetail = () => {
       const result = await startTaskApi(task._id);
       if (result.data && result.data.success) {
         setTask(result.data.response); 
-        alert("Session synchronized: Started");
       }
-    } catch (error) {
-      alert("Failed to initiate session node.");
+    } catch {
+      alert("Failed to initiate session.");
     }
   };
 
@@ -83,53 +109,38 @@ const TaskDetail = () => {
       const result = await stopTaskApi(task._id);
       if (result.data && result.data.success) {
         setTask(result.data.response);
-        alert("Session synchronized: Terminated");
       }
-    } catch (error) {
-      alert("Failed to close session node.");
+    } catch {
+      alert("Failed to close session.");
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col justify-center items-center h-screen bg-[#0E0F13] text-indigo-500">
-        <div className="relative">
-          <div className="absolute inset-0 border-t-2 border-indigo-600 rounded-full animate-spin"></div>
-          <div className="w-12 h-12 border-2 border-slate-800 rounded-full"></div>
-        </div>
-        <p className="mt-4 text-[10px] font-mono text-slate-500">Synchronizing_Node...</p>
-      </div>
-    );
-  }
+  if (loading) return <div className="h-screen bg-white flex items-center justify-center font-mono">LOADING_SYSTEM...</div>;
+  if (!task) return <div className="h-screen bg-white flex items-center justify-center">Task Not Found</div>;
 
-  if (!task) {
-    return (
-      <div className="text-indigo-500 p-10 bg-[#0E0F13] h-screen flex flex-col items-center justify-center">
-        <h1 className="text-xl font-black mb-6 text-slate-600">Entry_Not_Found</h1>
-        <button onClick={() => navigate('/dashboard')} className="border border-slate-700 px-8 py-3 rounded-lg text-xs font-bold hover:bg-slate-800 transition-all">
-          Return to Hub
-        </button>
-      </div>
-    );
-  }
+  const statusUI = getStatusDisplay();
 
   return (
-    <div className="min-h-screen bg-[#0E0F13] text-indigo-500 font-sans flex">
+    <div className="min-h-screen bg-white text-black font-sans flex">
       <Sidebar onCollapse={setIsSidebarCollapsed} />
 
       <div className={`flex-1 transition-all duration-300 flex flex-col min-h-screen w-full
         ${isSidebarCollapsed ? "lg:pl-20" : "lg:pl-64"} pl-0`}>
 
-        <nav className="border-b border-slate-800 bg-[#17181E] px-4 md:px-8 py-6 sticky top-0 z-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <h1 className="text-xl md:text-2xl font-black text-indigo-500 truncate mt-12 ml-15 md:mt-0">
-            {task.title}
-          </h1>
+        <nav className="border-b border-gray-200 bg-white px-4 md:px-8 py-6 sticky top-0 z-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="mt-12 md:mt-0 ml-15 md:ml-0">
+            <h1 className="text-xl md:text-2xl font-black text-black truncate capitalize">
+              {task.title}
+            </h1>
+            <p className="text-[10px] text-gray-400 font-mono">ID: {task._id}</p>
+          </div>
 
           <div className="flex gap-2 w-full md:w-auto">
-            <button onClick={() => navigate(`/update/${task._id}`)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-slate-800 text-slate-300 border border-slate-700 hover:text-indigo-600 text-sm font-bold">
+            <button onClick={()=>navigate(`/update/${task._id}`)}
+             className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-gray-50 text-gray-600 border border-gray-200 hover:text-black text-xs font-black uppercase">
               <FontAwesomeIcon icon={faUpload} /> Modify
             </button>
-            <button onClick={() => handleDelete(task._id)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-red-500 text-white text-sm font-bold">
+            <button onClick={() => handleDelete(task._id)} className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-2 rounded-xl bg-red-600 text-white text-xs font-black uppercase">
               <FontAwesomeIcon icon={faTrash} /> Delete
             </button>
           </div>
@@ -139,99 +150,133 @@ const TaskDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10">
 
             <div className="lg:col-span-8 space-y-8">
-              <div className="bg-[#17181E] border border-slate-800 p-6 md:p-8 rounded-2xl">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                  <div className="w-14 h-14 bg-indigo-600/10 rounded-xl flex items-center justify-center text-indigo-600">
+              {/* Summary Card */}
+              <div className="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm">
+                <div className="flex gap-6">
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${task.isRunning ? "bg-black text-white animate-pulse" : "bg-gray-100 text-black"}`}>
                     <FontAwesomeIcon icon={faHourglassHalf} className="text-2xl" />
                   </div>
                   <div>
-                    <p className="text-slate-500 text-xs font-bold">Time Remaining</p>
-                    <p className={`text-2xl md:text-3xl font-mono font-bold ${timeLeft === "EXPIRED" ? "text-red-500" : "text-indigo-500"}`}>
-                      {timeLeft}
+                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Time Remaining</p>
+                    <p className={`text-2xl md:text-3xl font-mono font-black ${timeLeft === "EXPIRED" || isExpired ? "text-red-500" : "text-black"}`}>
+                      {isExpired ? "EXPIRED" : timeLeft}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="mt-8 pt-6 border-t border-gray-200 flex flex-wrap gap-4 justify-between items-center">
                   <div>
-                    <p className="text-slate-500 text-xs font-bold">Priority</p>
-                    <p className="text-indigo-600 font-bold">{task.priority}</p>
+                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Priority Level</p>
+                    <p className="text-black font-black uppercase text-sm">{task.priority}</p>
                   </div>
 
-                  <div className="flex gap-2 w-full sm:w-auto">
+                  <div className="flex gap-2">
                     <button 
-                      onClick={handleStart}  
-                      disabled={task.isRunning} 
-                      className={`flex-1 sm:px-8 py-2 rounded font-bold text-white transition-all ${task.isRunning ? "bg-slate-700" : "bg-indigo-600 hover:scale-105"}`}
+                      onClick={handleStart} 
+                      disabled={task.isRunning || task.status === "completed" || isExpired}
+                      className={`px-8 py-3 rounded-lg font-black text-[10px] uppercase tracking-widest transition-all ${
+                        (task.isRunning || task.status === "completed" || isExpired) 
+                        ? "bg-gray-100 text-gray-300 cursor-not-allowed" 
+                        : "bg-black text-white hover:bg-gray-800 shadow-lg shadow-gray-200"
+                      }`}
                     >
-                      Start
+                      {task.status === "completed" ? "Task Finished" : "Start Session"}
                     </button>
-
                     <button 
                       onClick={handleStop} 
-                      disabled={!task.isRunning} 
-                      className={`flex-1 sm:px-8 py-2 rounded font-bold transition-all ${!task.isRunning ? "bg-slate-900 text-slate-600" : "bg-slate-800 text-indigo-500 hover:bg-slate-700"}`}
+                      disabled={!task.isRunning}
+                      className={`px-8 py-3 rounded-lg font-black text-[10px] uppercase tracking-widest border transition-all ${
+                        !task.isRunning 
+                        ? "bg-white text-gray-200 border-gray-100 cursor-not-allowed" 
+                        : "bg-white text-black border-black hover:bg-gray-50"
+                      }`}
                     >
-                      Stop
+                      Stop Session
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* Progress */}
-              <div className="bg-[#17181E] border border-slate-800 p-8 rounded-2xl flex flex-col items-center">
-                <div className="w-full flex justify-between mb-6">
-                  <p className="text-slate-500 text-[10px] font-black">Work Progress</p>
-                  <span className="text-indigo-600 font-mono text-xs font-bold">{progress}%</span>
+              {/* Progress Circle Card */}
+              <div className="bg-white border border-gray-200 p-8 rounded-2xl flex flex-col items-center shadow-sm">
+                <div className="w-full flex justify-between mb-8">
+                  <div>
+                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Efficiency Tracking</p>
+                    <p className="text-[11px] text-gray-500 font-mono font-bold mt-1">
+                      {Math.floor((task.totalWorkedTime || 0) / 60000)} / {task.required_time} MINS USED
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-black font-mono text-2xl font-black">{Math.floor(progress)}%</span>
+                  </div>
                 </div>
 
                 <div className="relative flex items-center justify-center w-48 h-48 md:w-64 md:h-64">
                   <svg viewBox="0 0 224 224" className="w-full h-full transform -rotate-90">
-                    <circle cx="112" cy="112" r="90" stroke="#0E0F13" strokeWidth="15" fill="transparent" />
-
+                    <circle cx="112" cy="112" r="90" stroke="#F3F4F6" strokeWidth="15" fill="transparent" />
                     <circle 
                       cx="112" cy="112" r="90" 
-                      stroke="indigo" 
-                      strokeWidth="10" 
+                      stroke={task.status === "completed" ? "#22C55E" : "black"} 
+                      strokeWidth="12"
                       fill="transparent" 
-                      strokeDasharray={strokeDasharray} 
+                      strokeDasharray={strokeDasharray}
                       strokeDashoffset={strokeDashoffset} 
-                      strokeLinecap="round"
+                      strokeLinecap="round" 
+                      className="transition-all duration-700 ease-in-out" 
                     />
                   </svg>
 
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <h2 className="text-3xl font-black text-indigo-600">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <h2 className={`text-4xl md:text-5xl font-black tracking-tighter ${task.status === "completed" ? "text-green-500" : "text-black"}`}>
                       {Math.floor(progress)}%
                     </h2>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Completion</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-[#17181E] border border-slate-800 p-6 md:p-8 rounded-2xl">
-                <div className="flex items-center gap-3 mb-4 text-indigo-600">
-                  <FontAwesomeIcon icon={faLayerGroup} />
-                  <span className="text-indigo-500 font-bold text-xs">Description</span>
+              {/* Description Card */}
+              <div className="bg-white border border-gray-200 p-6 md:p-8 rounded-2xl shadow-sm">
+                <div className="flex items-center gap-3 mb-6 text-black border-b border-gray-100 pb-4">
+                  <FontAwesomeIcon icon={faLayerGroup} className="text-gray-400 text-xs" />
+                  <span className="font-black text-[10px] uppercase tracking-widest">Description & Goals</span>
                 </div>
-                <p className="text-slate-400">{task.description}</p>
+                <p className="text-gray-600 leading-relaxed text-sm">{task.description}</p>
               </div>
             </div>
 
+            {/* Sidebar Metadata */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="bg-[#17181E] border border-slate-800 p-6 rounded-2xl">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-slate-400">
-                    <FontAwesomeIcon icon={faCalendarCheck} />
-                    <span className="text-xs font-bold">Metadata</span>
+              <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 text-gray-400">
+                    <FontAwesomeIcon icon={faCalendarCheck} className="text-xs" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Metadata Logs</span>
                   </div>
-                  <p className="text-sm text-slate-300">Created: <span className="text-indigo-500">{formatDate(task.createdAt)}</span></p>
-                  <p className="text-sm text-slate-300">Due: <span className="text-indigo-500">{formatDate(task.dueDate)}</span></p>
-                  <div className="pt-4 border-t border-slate-800">
-                    <span className="px-3 py-1 bg-indigo-600/10 text-indigo-600 text-[10px] font-bold rounded-full">
-                      Status: {task.status}
-                    </span>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Created On</p>
+                      <p className="text-sm font-bold text-black font-mono">{formatDate(task.createdAt)}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-gray-400 uppercase mb-1">Due Deadline</p>
+                      <p className="text-sm font-bold text-black font-mono">{formatDate(task.dueDate)}</p>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-gray-100">
+                    <p className="text-[10px] font-black text-gray-400 uppercase mb-3">System Status</p>
+                    <div className={`inline-flex px-4 py-2 border rounded-xl text-[10px] font-black uppercase tracking-tighter ${statusUI.color}`}>
+                      {statusUI.text}
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl">
+                 <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2">Technical Reference</p>
+                 <p className="text-[10px] font-mono text-gray-400 break-all select-all">{task._id}</p>
               </div>
             </div>
 

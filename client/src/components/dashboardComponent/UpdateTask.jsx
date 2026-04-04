@@ -9,14 +9,31 @@ import { toast } from 'react-toastify';
 const UpdateTask = () => {
   const navigate = useNavigate()
   const { id } = useParams()
+  
+  // State matches your Mongoose Model exactly
   const [taskData, setTaskData] = useState({
     title: "",
     description: "",
-    priority: "",
-    difficulty: "",
-    startDate: "",
+    priority: "medium",
+    difficultyLevel: "medium", // FIXED: Was 'difficulty'
+    startedDate: "",           // FIXED: Was 'startDate'
     dueDate: ""
   })
+
+  // State for calculating the 'required_time' Number
+  const [timeParts, setTimeParts] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+  });
+
+  const handleTimeChange = (e) => {
+    const { name, value } = e.target;
+    setTimeParts({
+      ...timeParts,
+      [name]: parseInt(value) || 0,
+    });
+  };
 
   const handleChange = (e) => {
     setTaskData({ ...taskData, [e.target.name]: e.target.value })
@@ -26,21 +43,28 @@ const UpdateTask = () => {
     e.preventDefault()
     
     if (!window.confirm("Confirm: are you sure update the task ?")) {
-      //  navigate(`/task-detail/${id}`)
-     return;
+      return;
     }
+
+    // Calculate the 'required_time' your Model requires
+    const totalMinutes = timeParts.days * 1440 + timeParts.hours * 60 + timeParts.minutes;
+
+    const payload = {
+      ...taskData,
+      required_time: totalMinutes, // FIXED: Now sending the required Number
+    };
     
     try {
-      await updateAPI(id, taskData)
-      
-      toast.success("update successfully")
+      await updateAPI(id, payload)
+      toast.success("Update successful!");
     
-      setTimeout(()=>{
+      setTimeout(() => {
            navigate(`/task-detail/${id}`)
-      },2000)
+      }, 1500)
      
     } catch (error) {
-      console.error("Error:", error)
+      console.error("Update_Error:", error)
+      toast.error("Update failed on the server")
     }
   }
 
@@ -49,10 +73,24 @@ const UpdateTask = () => {
       try {
         const result = await getTaskDetailApi(id)
         if (result.data && result.data.success) {
+          const res = result.data.response;
+
+          // Hydrate the time parts from the database number
+          const total = res.required_time || 0;
+          setTimeParts({
+            days: Math.floor(total / 1440),
+            hours: Math.floor((total % 1440) / 60),
+            minutes: total % 60
+          });
+
+          // Match the Model keys when loading data
           setTaskData({
-            ...result.data.response,
-            startDate: result.data.response.startDate?.split('T')[0] || '',
-            dueDate: result.data.response.dueDate?.split('T')[0] || ''
+            title: res.title || "",
+            description: res.description || "",
+            priority: res.priority || "medium",
+            difficultyLevel: res.difficultyLevel || "medium",
+            startedDate: res.startedDate?.split('T')[0] || '',
+            dueDate: res.dueDate?.split('T')[0] || ''
           })
         }
       } catch (error) {
@@ -62,40 +100,49 @@ const UpdateTask = () => {
     if (id) getTask()
   }, [id])
 
-  const inputStyle = "w-full bg-[#0E0F13] border border-slate-800 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-[#F7A600]/50 transition-all placeholder:text-slate-700 text-[#EAECEF]";
-  const labelStyle = "text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-2 block";
+  const inputStyle = "w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black transition-all placeholder:text-gray-400 text-black";
+  const labelStyle = "text-[10px] font-black text-gray-500 uppercase tracking-widest ml-1 mb-2 block";
 
   return (
-    <div className="min-h-screen bg-[#0E0F13] flex items-center justify-center p-6 font-sans">
-      <div className="w-full max-w-3xl bg-[#17181E] border border-slate-800/60 rounded-2xl shadow-2xl p-10 relative">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">
+      <div className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-2xl p-10 relative">
         
         <div className="flex justify-between items-start mb-10">
           <div>
-            <h1 className="text-3xl font-black text-white  font-serif">
-              Update <span className="text-[#F7A600]">Task ID: {id}</span>
+            <h1 className="text-3xl font-black text-black font-serif">
+              Update <span className="text-black">Process Control</span>
             </h1>
-            <p className="text-slate-500 text-[10px] font-black  tracking-[0.2em] mt-2">
-               Modify existing metadata
+            <p className="text-gray-400 text-[10px] font-black mt-2">
+                MODIFYING METADATA FOR: {id.slice(-6).toUpperCase()}
             </p>
           </div>
-          <FontAwesomeIcon icon={faDatabase} className="text-slate-800 text-2xl" />
+          <FontAwesomeIcon icon={faDatabase} className="text-gray-300 text-2xl" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className={labelStyle}>entry title:</label>
-            <input type="text" name="title" value={taskData.title} onChange={handleChange} className={inputStyle} />
+            <label className={labelStyle}>task title:</label>
+            <input type="text" name="title" value={taskData.title} onChange={handleChange} className={inputStyle} required />
           </div>
 
           <div>
-            <label className={labelStyle}>entry description:</label>
+            <label className={labelStyle}>task description:</label>
             <textarea name="description" value={taskData.description} onChange={handleChange} rows={3} className={inputStyle} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Added Required Time Fields to Match Model */}
+            <div>
+              <label className={labelStyle}>Required Time (D/H/M):</label>
+              <div className="flex gap-2">
+                <input type="number" name="days" value={timeParts.days} onChange={handleTimeChange} className={inputStyle} />
+                <input type="number" name="hours" value={timeParts.hours} onChange={handleTimeChange} className={inputStyle} />
+                <input type="number" name="minutes" value={timeParts.minutes} onChange={handleTimeChange} className={inputStyle} />
+              </div>
+            </div>
 
             <div>
-              <label className={labelStyle}>priority val:</label>
+              <label className={labelStyle}>priority level:</label>
               <select name="priority" value={taskData.priority} onChange={handleChange} className={inputStyle}>
                 <option value="low">low</option>
                 <option value="medium">medium</option>
@@ -103,8 +150,8 @@ const UpdateTask = () => {
               </select>
             </div>
             <div>
-              <label className={labelStyle}>difficulty val:</label>
-              <select name="difficulty" value={taskData.difficulty} onChange={handleChange} className={inputStyle}>
+              <label className={labelStyle}>difficulty level:</label>
+              <select name="difficultyLevel" value={taskData.difficultyLevel} onChange={handleChange} className={inputStyle}>
                 <option value="easy">easy</option>
                 <option value="medium">medium</option>
                 <option value="hard">hard</option>
@@ -114,27 +161,29 @@ const UpdateTask = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className={labelStyle}>timestamp start:</label>
-              <input type="date" name="startDate" value={taskData.startDate} onChange={handleChange} className={inputStyle} />
+              <label className={labelStyle}>start date:</label>
+              <input type="date" name="startedDate" value={taskData.startedDate} onChange={handleChange} className={inputStyle} required />
             </div>
             <div>
-              <label className={labelStyle}>timestamp due:</label>
-              <input type="date" name="dueDate" value={taskData.dueDate} onChange={handleChange} className={inputStyle} />
+              <label className={labelStyle}>due date:</label>
+              <input type="date" name="dueDate" value={taskData.dueDate} onChange={handleChange} className={inputStyle} required />
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row gap-4 pt-6 border-t border-slate-800/50">
+          <div className="flex flex-col md:flex-row gap-4 pt-6 border-t border-gray-200">
             <button
               type="button"
               onClick={() => navigate(`/task-detail/${id}`)}
-              className="flex-1 border border-slate-800 text-slate-400 py-4 rounded-lg font-black text-xm  hover:bg-white/5 transition-all flex items-center justify-center gap-2"
+              className="flex-1 border border-gray-300 text-gray-500 py-4 rounded-lg font-black text-xs hover:bg-gray-100 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <FontAwesomeIcon icon={faXmark} /> Cancel Update         </button>
-            <button  
+              <FontAwesomeIcon icon={faXmark} /> Cancel
+            </button>
+
+            <button   
               type="submit"
-              className="flex-2 bg-[#F7A600] hover:bg-[#ffb700] text-black py-4 px-12 rounded-lg font-black text-xm  transition-all shadow-lg shadow-[#F7A600]/10 flex items-center justify-center gap-2"
+              className="flex-2 bg-black hover:bg-gray-800 text-white py-4 px-12 rounded-lg font-black text-xs transition-all shadow-lg shadow-gray-300/10 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <FontAwesomeIcon icon={faRotate} /> Save Update
+              <FontAwesomeIcon icon={faRotate} /> Sync Update
             </button>
           </div>
         </form>

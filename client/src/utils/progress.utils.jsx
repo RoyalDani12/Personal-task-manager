@@ -1,33 +1,27 @@
-
 export const calculateProgress = (task) => {
-  if (!task || !task.createdAt || !task.dueDate) return 0;
+  if (!task || !task.required_time) return 0;
 
-  const start = new Date(task.createdAt).getTime();
-  const end = new Date(task.dueDate).getTime();
-  
+  // 1. Convert Required Time (minutes) to Milliseconds
+  const totalRequiredMs = task.required_time * 60 * 1000;
 
-  const totalAllocatedTime = end - start;
+  // 2. Get saved worked time (milliseconds)
+  let totalWorkedMs = task.totalWorkedTime || 0;
 
-  if (totalAllocatedTime <= 0) return 0;
-
-  
-  let totalWorked = task.totalWorkedTime || 0;
-
-  
+  // 3. Add live session time if the timer is currently running
   if (task.isRunning && task.sessions?.length > 0) {
     const lastSession = task.sessions[task.sessions.length - 1];
     if (lastSession.startTime && !lastSession.endTime) {
       const liveSessionDuration = new Date().getTime() - new Date(lastSession.startTime).getTime();
-      totalWorked += liveSessionDuration;
+      totalWorkedMs += liveSessionDuration;
     }
   }
 
-  
-  let percent = (totalWorked / totalAllocatedTime) * 100;
+  // 4. Calculate percentage based on effort, not calendar dates
+  let percent = (totalWorkedMs / totalRequiredMs) * 100;
 
   // Clamp between 0 and 100
   if (percent < 0) percent = 0;
   if (percent > 100) percent = 100;
 
-  return percent.toFixed(4);
+  return percent.toFixed(2); // 2 decimal places is usually enough for UI
 };

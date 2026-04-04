@@ -4,7 +4,6 @@ export const registerSchema = Joi.object({
   name: Joi.string()
     .trim()
     .required()
-    .alphanum()
     .lowercase()
     .min(4)
     .max(30)

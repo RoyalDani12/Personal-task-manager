@@ -49,7 +49,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="w-full min-h-[80vh] md:min-h-[75vh] flex items-center bg-slate-950">
+    <section className="w-full min-h-screen md:min-h-screen flex items-center bg-white">
       <Swiper
         slidesPerView={1}
         loop
@@ -62,8 +62,8 @@ const Hero = () => {
             <div className="grid md:grid-cols-2 gap-8 items-center px-6 md:px-16 py-10">
 
               {/* LEFT CONTENT */}
-              <div className="text-white animation-float"> 
-                <div className="mb-4 text-indigo-400 text-3xl">
+              <div className="text-black animation-float"> 
+                <div className="mb-4 text-indigo-600 text-3xl">
                   <FontAwesomeIcon icon={slide.icon} />
                 </div>
 
@@ -71,36 +71,36 @@ const Hero = () => {
                   {slide.title}
                 </h1>
 
-                <p className="text-slate-300 text-sm md:text-lg mb-6 max-w-lg">
+                <p className="text-gray-800 text-sm md:text-lg mb-6 max-w-lg">
                   {slide.description}
                 </p>
 
                 <div className="flex gap-4 flex-wrap">
                   <Link
                     to="/register"
-                    className="bg-indigo-600 px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-indigo-700 transition-all"
+                    className="bg-black text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-gray-800 transition-all"
                   >
                     Get Started
                     <FontAwesomeIcon icon={faArrowRight} />
                   </Link>
 
-                  <button className="border border-white/30 px-6 py-3 rounded-full hover:bg-white hover:text-black transition-all"> <Link to={'/login'}>View Tasks</Link>
-                    
+                  <button className="border border-black px-6 py-3 rounded-full hover:bg-black hover:text-white transition-all">
+                    <Link to={'/login'}>View Tasks</Link>
                   </button>
                 </div>
 
                 {/* Stats */}
-                <div className="flex gap-8 mt-8 text-sm text-slate-400">
+                <div className="flex gap-8 mt-8 text-sm text-gray-700">
                   <div>
-                    <p className="text-white font-bold text-lg">1K+</p>
+                    <p className="text-black font-bold text-lg">1K+</p>
                     Tasks
                   </div>
                   <div>
-                    <p className="text-white font-bold text-lg">500+</p>
+                    <p className="text-black font-bold text-lg">500+</p>
                     Users
                   </div>
                   <div>
-                    <p className="text-white font-bold text-lg">99%</p>
+                    <p className="text-black font-bold text-lg">99%</p>
                     Efficiency
                   </div>
                 </div>
@@ -115,12 +115,12 @@ const Hero = () => {
                 />
 
                 {/* overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/40 to-transparent" />
 
                 {/* progress bar */}
-                <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-700">
+                <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-300">
                   <div
-                    className="h-1 bg-indigo-500"
+                    className="h-1 bg-black"
                     style={{ width: `${progress}%` }}
                   />
                 </div>

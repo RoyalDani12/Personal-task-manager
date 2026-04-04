@@ -13,12 +13,12 @@ const Header = ({ UserName }) => {
   };
 
   return (
-    <header className="w-full bg-[#0E0F13] h-20 px-4 md:px-8 flex items-center justify-between border-b border-slate-800/60 sticky top-0 z-50">
+    <header className="w-full bg-white h-20 px-4 md:px-8 flex items-center justify-between border-b border-gray-300 sticky top-0 z-50">
       
       {/* Brand */}
       <div className="flex items-center gap-2 md:gap-4">
-        <h1 className="text-lg md:text-xl font-black text-indigo-500 flex items-center gap-2">
-          <span className="bg-indigo-600 text-white px-1.5 py-0.5 rounded-sm text-sm">AX</span>
+        <h1 className="text-lg md:text-xl font-black text-black flex items-center gap-2">
+          <span className="bg-black text-white px-1.5 py-0.5 rounded-sm text-sm">AX</span>
           <span className="hidden sm:inline">DASHBOARD</span>
         </h1>
       </div>
@@ -29,11 +29,11 @@ const Header = ({ UserName }) => {
           <input
             type="text"
             placeholder="Search assets..."
-            className="w-full rounded-md px-4 py-1.5 pl-10 border border-slate-800 bg-[#17181E] text-indigo-500 placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-600 transition-all"
+            className="w-full rounded-md px-4 py-1.5 pl-10 border border-gray-300 bg-gray-100 text-black placeholder-gray-500 text-sm focus:outline-none focus:border-black transition-all"
           />
           <FontAwesomeIcon
             icon={faSearch}
-            className="absolute left-3.5 top-2.5 text-slate-500 text-xs"
+            className="absolute left-3.5 top-2.5 text-gray-500 text-xs"
           />
         </div>
       </div>
@@ -42,17 +42,17 @@ const Header = ({ UserName }) => {
       <div className="flex items-center gap-3 md:gap-6">
         
         {/* Notification */}
-        <button className="text-slate-400 hover:text-indigo-600 transition-colors relative p-1">
+        <button className="text-gray-600 hover:text-black transition-colors relative p-1">
           <FontAwesomeIcon icon={faBell} className="text-lg" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-[#0E0F13]"></span>
+          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
         </button>
 
         {/* User */}
-        <div className="flex items-center gap-3 border-l border-slate-800 pl-3 md:pl-6">
+        <div className="flex items-center gap-3 border-l border-gray-300 pl-3 md:pl-6">
           <div className="hidden lg:block text-right">
-            <p className="text-sm font-semibold text-indigo-500 leading-none">{UserName}</p>
+            <p className="text-sm font-semibold text-black leading-none">{UserName}</p>
           </div>
-          <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-slate-800 flex items-center justify-center text-indigo-500 border border-slate-700">
+          <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-gray-200 flex items-center justify-center text-black border border-gray-300">
             <FontAwesomeIcon icon={faUser} className="text-xs" />
           </div>
         </div>
@@ -61,7 +61,7 @@ const Header = ({ UserName }) => {
         <button
           onClick={handleLogout}
           className="
-            text-slate-400
+            text-gray-600
             hover:text-red-500
             text-sm
             font-bold
