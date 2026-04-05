@@ -44,9 +44,11 @@ const AddTask = () => {
 
     const totalMinutes =
       timeParts.days * 1440 + timeParts.hours * 60 + timeParts.minutes;
-
+   const selectedDate = new Date(taskData.dueDate);
+   selectedDate.setHours(23,59,59,999)
     const payload = {
       ...taskData,
+      dueDate:selectedDate.toISOString(),
       required_time: totalMinutes,
     };
 

@@ -8,6 +8,7 @@ const startTaskWatcher = (io) => {
       // 1. Get only tasks that are currently "isRunning"
       const activeTasks = await taskRepository.getAllRunningTasks(); 
 
+      // optimization check
       if (activeTasks.length === 0) return; // Save resources if nothing is running
 
       for (const task of activeTasks) {
@@ -19,8 +20,8 @@ const startTaskWatcher = (io) => {
 
         // 2. Calculate current total time including the live session
         const liveSessionMs = new Date().getTime() - new Date(lastSession.startTime).getTime();
-        const totalWorkedMs = (task.totalWorkedTime || 0) + liveSessionMs;
-        const requiredMs = (task.required_time || 0) * 60 * 1000;
+        const totalWorkedMs = (task.totalWorkedTime || 0) + liveSessionMs
+        const requiredMs = (task.required_time || 0) * 60 * 1000; //  change to mil seconds
 
         // 3. The "Auto-Stop" Trigger
         if (totalWorkedMs >= requiredMs) {
