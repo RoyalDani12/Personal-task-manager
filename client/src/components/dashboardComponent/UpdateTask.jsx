@@ -49,8 +49,12 @@ const UpdateTask = () => {
     // Calculate the 'required_time' your Model requires
     const totalMinutes = timeParts.days * 1440 + timeParts.hours * 60 + timeParts.minutes;
 
+    // set the time to 23:59:59
+    const selectedDate = new Date(taskData.dueDate)
+       selectedDate.setHours(23,59,59,999)
     const payload = {
       ...taskData,
+      dueDate:selectedDate.toISOString(),
       required_time: totalMinutes, // FIXED: Now sending the required Number
     };
     

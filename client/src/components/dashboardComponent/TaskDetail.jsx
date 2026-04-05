@@ -14,7 +14,10 @@ import Sidebar from "./Sidebar";
 import { formatDate, calculateTimeLeft } from "../../utils/time.utils";
 import { startTaskApi } from "../../api/start.task.api";
 import { stopTaskApi } from "../../api/stop.task.api";
+import { io } from "socket.io-client"
 
+              // connect to the backend
+const socket = io("http://localhost:5000", { withCredentials: true })
 const TaskDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -24,6 +27,23 @@ const TaskDetail = () => {
   const [progress, setProgress] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
+  // socket io 
+
+  useEffect(()=>{
+    if (!id) return;
+
+    const eventName =`task_finished:${id}`;
+    socket.on(eventName, (updateTask)=>{
+      console.log("server signal : Task auto-complete by watcher")
+      setTask(updateTask)
+    } )
+    return ()=>{
+      socket.off(eventName)
+    }
+
+  },[id])
+
+
   const strokeDasharray = 565.48; 
   const strokeDashoffset = strokeDasharray - (progress / 100) * strokeDasharray;
 
@@ -31,8 +51,8 @@ const TaskDetail = () => {
   const calculateLiveProgress = (currentTask) => {
     if (!currentTask || !currentTask.required_time) return 0;
 
-    const totalRequiredMs = currentTask.required_time * 60 * 1000;
-    let totalWorkedMs = currentTask.totalWorkedTime || 0;
+    const totalRequiredMs =Number( currentTask.required_time) * 60 * 1000;
+    let totalWorkedMs = Number( currentTask.totalWorkedTime ) || 0;
 
     if (currentTask.isRunning && currentTask.sessions?.length > 0) {
       const lastSession = currentTask.sessions[currentTask.sessions.length - 1];
@@ -43,7 +63,7 @@ const TaskDetail = () => {
     }
 
     let percent = (totalWorkedMs / totalRequiredMs) * 100;
-    return Math.min(Math.max(percent, 0), 100).toFixed(2); 
+    return Math.min(Math.max(percent, 0), 100).toFixed(4); 
   };
 
   // --- 2. LIVE STATUS LOGIC ---
@@ -158,8 +178,9 @@ const TaskDetail = () => {
                   </div>
                   <div>
                     <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Time Remaining</p>
-                    <p className={`text-2xl md:text-3xl font-mono font-black ${timeLeft === "EXPIRED" || isExpired ? "text-red-500" : "text-black"}`}>
-                      {isExpired ? "EXPIRED" : timeLeft}
+                    <p className={`text-2xl md:text-3xl font-mono font-black ${timeLeft === "EXPIRED" || isExpired ? "text-red-500" : "text-green-500"}`}>
+                      { task.status === "completed" ?"Mission Accomplished" :
+                      (isExpired ? "EXPIRED" : timeLeft)}
                     </p>
                   </div>
                 </div>
