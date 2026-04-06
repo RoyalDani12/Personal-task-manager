@@ -4,6 +4,7 @@ import { faPlus, faTerminal, faXmark } from "@fortawesome/free-solid-svg-icons";
 import addTaskApi from "../../api/addTask.Api";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { addTaskValidatorSchema } from "../../validators/add.task.validator";
 
 const AddTask = () => {
   const navigate = useNavigate();
@@ -14,7 +15,6 @@ const AddTask = () => {
     difficultyLevel: "medium",
     startedDate: "",
     dueDate: "",
-    isActive: true,
   });
 
   const [timeParts, setTimeParts] = useState({
@@ -22,6 +22,8 @@ const AddTask = () => {
     hours: 0,
     minutes: 0,
   });
+
+  const [errors, setError] = useState({});
 
   const handleTimeChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +53,22 @@ const AddTask = () => {
       dueDate:selectedDate.toISOString(),
       required_time: totalMinutes,
     };
+    setError({}); // clear the previous error before validating
+    const { error } = addTaskValidatorSchema.validate(payload, {
+      abortEarly: false,
+    });
 
+    if (error) {
+      const ValidationError = error.details.reduce((acc, curr) => {
+        acc[curr.path[0]] = curr.message;
+        return acc;
+      }, {});
+
+      setError(ValidationError);
+      console.log(ValidationError);
+      return toast.error("please fix the highlighted errors.");
+    }
+    // console.log(errors)
     try {
       await addTaskApi(payload);
       window.alert("Success: Task_Created");
@@ -63,15 +80,14 @@ const AddTask = () => {
   };
 
   const inputStyle =
-    "w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black transition-all placeholder:text-gray-400 text-black";
-  
+    "w-full bg-white border  rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black transition-all placeholder:text-gray-400 text-black";
+
   const labelStyle =
-    "text-[10px] font-black text-gray-500 uppercase ml-1 mb-2 block";
+    "text-[14px]  font-bold text-black  ml-1 mb-2 block";
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6 font-sans text-black">
       <div className="w-full max-w-3xl bg-white border border-gray-200 rounded-2xl shadow-2xl p-10 relative">
-        
         <div className="flex justify-between items-start mb-10">
           <div>
             <h1 className="text-3xl font-black text-black font-serif">
@@ -91,27 +107,38 @@ const AddTask = () => {
           {/* Title */}
           <div>
             <label className={labelStyle}>task title:</label>
+            {errors.title && (
+              <p className="text-rose-600 font-bold text-xs mb-1">{errors.title}</p>
+            )}
             <input
               type="text"
               name="title"
               value={taskData.title}
               onChange={handleChange}
-              required
               placeholder="Enter_Title..."
-              className={inputStyle}
+              className={`${inputStyle} ${
+                errors.title ? " border-red-500 " : " border-gray-300 "
+              }`}
             />
           </div>
 
           {/* Description */}
           <div>
             <label className={labelStyle}>task description:</label>
+            {errors.description && (
+              <p className="text-rose-600 font-bold text-xs mb-1">{errors.description}</p>
+            )}
             <textarea
               name="description"
               value={taskData.description}
               onChange={handleChange}
               placeholder="Enter_Task_Details..."
               rows={3}
-              className={inputStyle}
+              className={`${inputStyle} ${
+                errors.description
+                  ? " border border-red-500 "
+                  : " border-gray-300 "
+              }`}
             />
           </div>
 
@@ -121,17 +148,50 @@ const AddTask = () => {
               <label className={labelStyle}>
                 Required time to complete task:
               </label>
+              {errors.required_time && (
+                <p className="text-rose-600 font-bold text-xs mb-1">{errors.required_time}</p>
+              )}
               <div style={{ display: "flex", gap: "10px" }}>
                 <div>
-                  <input type="number" min="0" name="days" value={timeParts.days} onChange={handleTimeChange} className={inputStyle} placeholder="Days" />
+                  <input
+                    type="number"
+                    min="0"
+                    name="days"
+                    value={timeParts.days}
+                    onChange={handleTimeChange}
+                    className={`${inputStyle} ${
+                      errors.required_time ? " border-red-500 " : " border-gray-300 "
+                    }`}
+                    placeholder="Days"
+                  />
                   <span className="text-gray-500 text-xs">Days</span>
                 </div>
                 <div>
-                  <input type="number" min="0" name="hours" value={timeParts.hours} onChange={handleTimeChange} className={inputStyle} placeholder="Hours" />
+                  <input
+                    type="number"
+                    min="0"
+                    name="hours"
+                    value={timeParts.hours}
+                    onChange={handleTimeChange}
+                    className={`${inputStyle} ${
+                      errors.required_time ? " border-red-500 " : " border-gray-300 "
+                    }`}
+                    placeholder="Hours"
+                  />
                   <span className="text-gray-500 text-xs">Hours</span>
                 </div>
                 <div>
-                  <input type="number" min="0" name="minutes" value={timeParts.minutes} onChange={handleTimeChange} className={inputStyle} placeholder="Minutes" />
+                  <input
+                    type="number"
+                    min="0"
+                    name="minutes"
+                    value={timeParts.minutes}
+                    onChange={handleTimeChange}
+                    className={`${inputStyle} ${
+                      errors.required_time ? " border-red-500 " : " border-gray-300 "
+                    }`}
+                    placeholder="Minutes"
+                  />
                   <span className="text-gray-500 text-xs">Minutes</span>
                 </div>
               </div>
@@ -139,7 +199,17 @@ const AddTask = () => {
 
             <div>
               <label className={labelStyle}>priority level:</label>
-              <select name="priority" value={taskData.priority} onChange={handleChange} className={inputStyle}>
+              {errors.priority && (
+                <p className="text-rose-600 font-bold text-xs mb-1">{errors.priority}</p>
+              )}
+              <select
+                name="priority"
+                value={taskData.priority}
+                onChange={handleChange}
+                className={`${inputStyle} ${
+                  errors.priority ? " border-red-500 " : " border-gray-300 "
+                }`}
+              >
                 <option value="low">low</option>
                 <option value="medium">medium</option>
                 <option value="high">high</option>
@@ -148,7 +218,17 @@ const AddTask = () => {
 
             <div>
               <label className={labelStyle}>difficulty:</label>
-              <select name="difficultyLevel" value={taskData.difficultyLevel} onChange={handleChange} className={inputStyle}>
+              {errors.difficultyLevel && (
+                <p className="text-rose-600 font-bold text-xs mb-1">{errors.difficultyLevel}</p>
+              )}
+              <select
+                name="difficultyLevel"
+                value={taskData.difficultyLevel}
+                onChange={handleChange}
+                className={`${inputStyle} ${
+                  errors.difficultyLevel ? " border-red-500 " : " border-gray-300 "
+                }`}
+              >
                 <option value="easy">easy</option>
                 <option value="medium">medium</option>
                 <option value="hard">hard</option>
@@ -160,11 +240,33 @@ const AddTask = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelStyle}>start date:</label>
-              <input type="date" name="startedDate" value={taskData.startedDate} onChange={handleChange} className={inputStyle} />
+              {errors.startedDate && (
+                <p className="text-rose-600 font-bold text-xs mb-1">{errors.startedDate}</p>
+              )}
+              <input
+                type="date"
+                name="startedDate"
+                value={taskData.startedDate}
+                onChange={handleChange}
+                className={`${inputStyle} ${
+                  errors.startedDate ? " border-red-500 " : " border-gray-300 "
+                }`}
+              />
             </div>
             <div>
               <label className={labelStyle}>due date:</label>
-              <input type="date" name="dueDate" value={taskData.dueDate} onChange={handleChange} className={inputStyle} />
+              {errors.dueDate && (
+                <p className="text-rose-600 font-bold text-xs mb-1">{errors.dueDate}</p>
+              )}
+              <input
+                type="date"
+                name="dueDate"
+                value={taskData.dueDate}
+                onChange={handleChange}
+                className={`${inputStyle} ${
+                  errors.dueDate ? " border-red-500 " : " border-gray-300 "
+                }`}
+              />
             </div>
           </div>
 
