@@ -2,7 +2,7 @@ import expressAsyncHandler from "express-async-handler";
 import loginUseCase from '../../../core/use-case/login.usecase.js'
 import { userRepository } from "../../../infrastructure/repositories/user.repository.js";
 import { generateAccessToken,generateRefreshToken,verifyToken } from "../../../shared/utils/jwt.js";
-import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 
 const loginController = expressAsyncHandler( async(req,res)=>{
    
@@ -15,7 +15,7 @@ const loginController = expressAsyncHandler( async(req,res)=>{
     email:result.email
   })
 
-  //  genrate refreshtoken 
+  //  generate refreshtoken 
   const refreshToken = generateRefreshToken({
     id:result._id,
     role:result.role,
@@ -31,7 +31,11 @@ const loginController = expressAsyncHandler( async(req,res)=>{
     maxAge:7*24*60*60*1000 
    })
    //   hash  refresh token  
-   const hashedToken = await bcrypt.hash(refreshToken,10)
+       /*  i use the build in crypto for increase performance  of the app
+       */
+   const hashedToken = crypto.createHash('sha256')
+                             .update(refreshToken)
+                             .digest('hex')
      // save refresh token to the database 
      await userRepository.saveRefreshToken(result._id,hashedToken)
 

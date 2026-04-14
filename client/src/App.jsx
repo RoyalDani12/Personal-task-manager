@@ -9,6 +9,9 @@ import TaskDetail from "./components/dashboardComponent/TaskDetail"
 import AddTask from "./components/dashboardComponent/AddTask"
 import UpdateTask from "./components/dashboardComponent/UpdateTask"
 import ProfilePage from "./pages/profilePage"
+import ForgotPassword from "./pages/ForgotPassword"
+import ResetPassword from "./pages/ResetPassword"
+
 
 function App() {
 
@@ -25,6 +28,8 @@ function App() {
           <Route path="/create-task" element={<AddTask/>}></Route>
           <Route path="/update/:id" element={<UpdateTask/>}></Route>
           <Route path="/profile-page" element={<ProfilePage/>}> </Route>
+          <Route path="/forgot-password" element={<ForgotPassword/>}></Route>
+          <Route path="/reset-password" element={<ResetPassword/>}></Route>
        </Routes>
       </BrowserRouter>
      </div>
