@@ -7,6 +7,10 @@ import express from 'express'
  import { loginValidator } from './validators/login.validator.js'
  import { registerValidator } from './validators/register.validator.js'
  
+ import { forgotPassController } from './controller/forgot.password.controller.js'
+ import { forgotValidator } from './validators/forgot.validator.js'
+ 
+ 
 
 
 
@@ -15,6 +19,7 @@ import express from 'express'
  router.post('/login',loginValidator,loginController)
  router.post('/refresh-token',refreshController)
  router.post('/google-login',googleLoginController)
+ router.post('/forgot-pass',forgotValidator,forgotPassController)
 
  
 

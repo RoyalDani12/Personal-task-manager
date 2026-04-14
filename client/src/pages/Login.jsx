@@ -9,6 +9,7 @@ import { GoogleLogin } from "@react-oauth/google";
 import { googleLoginAPI } from "../api/google.login.api";
 import { loginSchema } from "../validators/login.validator";
 
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -130,6 +131,10 @@ const Login = () => {
                   <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
                 </button>
               </div>
+              <Link to={'/forgot-password'}> <span className=" underline flex  justify-end text-blue-600">
+              forgot password?
+              </span>
+              </Link>
             </div>
 
             {/* LOGIN BUTTON */}
