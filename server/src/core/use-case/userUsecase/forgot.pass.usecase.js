@@ -15,7 +15,7 @@ export const forgotPassUseCase =async(userRepository,email)=>{
 
     await user.save()
     //  prepare email
-    const resetUrl = `http://localhost:5173/reset-password?token=${resetPassToken}`
+    const resetUrl = `http://localhost:5173/reset-pass?token=${resetPassToken}`
 
 const htmlContent = `<div>
     <h1>Hello Daniel</h1>

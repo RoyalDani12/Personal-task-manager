@@ -29,7 +29,7 @@ function App() {
           <Route path="/update/:id" element={<UpdateTask/>}></Route>
           <Route path="/profile-page" element={<ProfilePage/>}> </Route>
           <Route path="/forgot-password" element={<ForgotPassword/>}></Route>
-          <Route path="/reset-password" element={<ResetPassword/>}></Route>
+          <Route path="/reset-pass" element={<ResetPassword/>}></Route>
        </Routes>
       </BrowserRouter>
      </div>
