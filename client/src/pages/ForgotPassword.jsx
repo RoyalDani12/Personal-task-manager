@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import forgotApi from "../api/forgot.api";
+import { forgotSchema } from "../validators/forgot.pass.validator";
 
 const ForgotPassword = () => {
   const [userEmail, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState("");
-  const [error, setError] = useState(""); // Added error handling UI
+  const [err, setError] = useState(""); // Added error handling UI
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -14,8 +15,26 @@ const ForgotPassword = () => {
     setIsLoading(true);
     setSuccess("");
     setError("");
+
+    
     
     try {
+
+      const { error }  =  forgotSchema.validate(userEmail,{
+        abortEarly:false,
+        errors :{
+          wrap:{
+            label:""
+          }
+        }
+      })
+
+      if(error){
+        setError(error.details[0].message)
+        setIsLoading(false)
+        console.log(err);
+        return
+      }
       const forgotResponse = await forgotApi(userEmail);
       setSuccess(forgotResponse.message);
     } catch (err) {
@@ -46,9 +65,9 @@ const ForgotPassword = () => {
           </div>
         )}
 
-        {error && (
+        {err && (
           <div className="w-full p-3 mb-6 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center">
-            {error}
+            {err}
           </div>
         )}
 

@@ -10,6 +10,7 @@ import express from 'express'
  import { forgotPassController } from './controller/forgot.password.controller.js'
  import { forgotValidator } from './validators/forgot.validator.js'
  import { resetPassController } from './controller/reset.password.controller.js'
+ import { resetPasswordValidator } from './validators/reset.password.validator.js'
  
  
 
@@ -21,7 +22,7 @@ import express from 'express'
  router.post('/refresh-token',refreshController)
  router.post('/google-login',googleLoginController)
  router.post('/forgot-pass',forgotValidator,forgotPassController)
- router.post('/reset-pass/:token',resetPassController)
+ router.post('/reset-pass/:token',resetPasswordValidator,resetPassController)
 
  
 
