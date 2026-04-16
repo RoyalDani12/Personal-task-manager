@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { resetAPI } from "../api/resetApi";
+import { resetPassSchema } from "../validators/reset.pass.validator";
 
 
 const ResetPassword = () => {
@@ -9,6 +10,7 @@ const ResetPassword = () => {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success,setSuccess]  = useState("")
+  const [err,setError] = useState('')
   
 
   const [searchParams] = useSearchParams()
@@ -18,15 +20,23 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-       console.log("password don't match");
-      
-    }
-
     setLoading(true);
-
     try {
-       
+        // clean data 
+        const { error } = resetPassSchema.validate({password,confirmPassword},{
+          abortEarly:false,
+          errors:{
+            wrap:{
+              label:""
+            }
+          }
+        })
+        if(error){
+          setError(error.details[0].message)
+          console.log(err);
+          setLoading(false)
+          return
+        }
       const response = await resetAPI(password ,confirmPassword ,token) 
        console.log(response.data);
         setSuccess(response.data.message)
@@ -49,6 +59,7 @@ const ResetPassword = () => {
             Ensure your new password is at least 8 characters long and strong.
           </p>
         </div>
+         { err && <p className="text-red-600">{err}</p>}
 
         {/* Status Notification */}
         {success && (
