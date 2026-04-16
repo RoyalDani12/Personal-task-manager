@@ -1,33 +1,38 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { resetAPI } from "../api/resetApi";
+
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ type: "", message: "" });
+  const [success,setSuccess]  = useState("")
   
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
+
+  const [searchParams] = useSearchParams()
+   const token  = searchParams.get('token')
+  
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      return setStatus({ type: "error", message: "Passwords do not match" });
+       console.log("password don't match");
+      
     }
 
     setLoading(true);
-    setStatus({ type: "", message: "" });
 
     try {
-      // Your actual API call would go here
-      // await resetPasswordApi(token, password);
-      setStatus({ type: "success", message: "Password updated successfully!" });
+       
+      const response = await resetAPI(password ,confirmPassword ,token) 
+       console.log(response.data);
+        setSuccess(response.data.message)
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setStatus({ type: "error", message: "Failed to reset password. Link may be expired." });
+      
     } finally {
       setLoading(false);
     }
@@ -46,11 +51,11 @@ const ResetPassword = () => {
         </div>
 
         {/* Status Notification */}
-        {status.message && (
+        {success && (
           <div className={`w-full p-3 mb-6 text-sm rounded-xl text-center border ${
-            status.type === "success" ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-600"
+            success ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-600"
           }`}>
-            {status.message}
+            {success}
           </div>
         )}
 
