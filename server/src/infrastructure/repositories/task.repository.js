@@ -28,7 +28,29 @@ const taskRepository = {
 
   // infrastructure/repositories/task.repository.js
 async getAllRunningTasks() {
-  return await Task.find({ isRunning: true });
+  return await Task.find({ isRunning: true })
+  .populate("createdBy","email")
+},
+
+
+// find task where deadline has passed 
+async getNewlyExpiredTasks() {
+  return await Task.find({
+    dueDate:{ $lt :new Date()},
+    status: {$nin : ['completed','expired'] }
+  }).populate("createdBy","email")
+},
+
+//  find task due in the next 24 hours
+async getTasksNeedingWarning (){
+   const tomorrow = new Date()
+   tomorrow.setHours(tomorrow.getHours() + 24 )
+
+   return await task.find({
+    dueDate : { $gt : new Date(),$lt :tomorrow },
+    status: { $nin : ["completed","expired"]},
+    isExpiryWarningSent :false
+   }).populate("createdBy","email")
 }
 
 }

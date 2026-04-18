@@ -1,4 +1,4 @@
-/* 
+
 import nodemailer from "nodemailer";
 
 const sendEmail = async (options) => {
@@ -30,4 +30,4 @@ const sendEmail = async (options) => {
   }
 };
 
-export default sendEmail; */
+export default sendEmail;

@@ -76,7 +76,3 @@ const User = mongoose.model("User", userSchema);
 
 export default User;
 
-//    additional tasks we have to add
-// 1, email reminder
-// 2, push notification
-// 3, search and fillter By status,priority, date ranged
