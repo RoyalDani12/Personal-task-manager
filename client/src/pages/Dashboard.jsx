@@ -23,11 +23,16 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   //make the filter button functional
-    const [priorityFilter, setPriorityFilter] = useState("");
-    const [statusFilter, setStatusFilter] = useState("");
-    const [sortOrder, setSortOrder] = useState("latest"); // Default to newest
+  const [priorityFilter, setPriorityFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState("latest"); // Default to newest
 
-    const filteredTask = getFilteredTasks(tasks,priorityFilter,statusFilter,sortOrder)
+  const filteredTask = getFilteredTasks(
+    tasks,
+    priorityFilter,
+    statusFilter,
+    sortOrder,
+  );
 
   useEffect(() => {
     fetchTasks();
@@ -169,10 +174,11 @@ const Dashboard = () => {
             <div className="flex flex-wrap justify-center gap-3 w-full lg:w-auto">
               {/* Priority Filter */}
               <div className="relative">
-                <select 
-                 value={priorityFilter}
-                 onChange={(e)=>setPriorityFilter(e.target.value)}
-                className=" bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold py-2 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-all">
+                <select
+                  value={priorityFilter}
+                  onChange={(e) => setPriorityFilter(e.target.value)}
+                  className=" bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold py-2 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-all"
+                >
                   <option value="">Priority: All</option>
                   <option value="high">High</option>
                   <option value="medium">Medium</option>
@@ -182,11 +188,11 @@ const Dashboard = () => {
 
               {/* Date Filter */}
               <div className="relative">
-               
-                <select 
-                 value={sortOrder}
-                 onChange={(e)=>setSortOrder(e.target.value)}
-                className=" bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold py-2 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-all">
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value)}
+                  className=" bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold py-2 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-all"
+                >
                   <option value="">Sort: Latest First</option>
                   <option value="oldest">Sort: Oldest First</option>
                 </select>
@@ -195,9 +201,10 @@ const Dashboard = () => {
               {/* Status Filter */}
               <div className="relative">
                 <select
-                 value={statusFilter}
-                 onChange={(e)=>setStatusFilter(e.target.value)}
-                 className=" bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold py-2 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-all">
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className=" bg-gray-50 border border-gray-200 text-gray-700 text-xs font-bold py-2 px-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/5 cursor-pointer hover:bg-gray-100 transition-all"
+                >
                   <option value="">Status: All</option>
                   <option value="completed">Completed</option>
                   <option value="pending">Pending</option>

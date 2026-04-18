@@ -1,6 +1,6 @@
 import Joi from 'joi'
 
-export const forgotSchema = Join.object({
+export const forgotSchema = Joi.object({
    email:Joi.string()
    .trim()
    .email()

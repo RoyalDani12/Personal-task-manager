@@ -57,11 +57,19 @@ const taskSchema = new mongoose.Schema(
     isRunning: {
       type: Boolean,
       default: false,
-    }, //   add when it should be  started
-    //  how can identify the system  the user is active of not
+    },
+
+    isExpiryWarningSent :{
+      type:Boolean,
+      default:false
+    },
+    isExpiredEmailSent:{
+      type:Boolean,
+      default:false
+    },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt
+    timestamps: true,
   },
 );
 

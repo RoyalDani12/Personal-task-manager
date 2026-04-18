@@ -10,7 +10,7 @@ import { googleLoginAPI } from "../api/google.login.api";
 import { loginSchema } from "../validators/login.validator";
 
 
-const Login = () => {
+const Login = ({ setUser }) => {
   const navigate = useNavigate();
 
   const [data, setData] = useState({ email: "", password: "" });
@@ -42,6 +42,9 @@ const Login = () => {
       setSuccess("Login Successfully. Redirecting...");
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("user", JSON.stringify(response.data));
+      // TRIGGER GLOBAL STATE UPDATE
+      const userData = response.data.result || response.data;
+      setUser(userData);
 
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch (error) {
@@ -58,6 +61,9 @@ const Login = () => {
       setSuccess("Google login successfully");
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("user", JSON.stringify(response.data));
+
+      const userData = response.data.user || response.data;
+    setUser(userData);
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch (error) {
       console.error("google auth error");

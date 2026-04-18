@@ -1,15 +1,45 @@
 import taskRepository from "../../infrastructure/repositories/task.repository.js";
+import sendEmail from "../../infrastructure/services/email.service.js";
 
 const startTaskWatcher = (io) => {
-  // Check every 10 seconds for better responsiveness during testing
-  // You can change this back to 30000 (30s) later for production
   setInterval(async () => {
     try {
-      // 1. Get only tasks that are currently "isRunning"
-      const activeTasks = await taskRepository.getAllRunningTasks(); 
+      // --- FLOW 1: DEADLINE EXPIRATION (Calendar Check) ---
+      const expiredByDate = await taskRepository.getNewlyExpiredTasks();
+      
+      for (const task of expiredByDate) {
+        const userId = task.createdBy._id;
+        const userEmail = task.createdBy.email;
 
-      // optimization check
-      if (activeTasks.length === 0) return; // Save resources if nothing is running
+        console.log(`[WATCHER] Task ${task._id} expired by deadline.`);
+        
+        // Update DB
+        task.status = "expired";
+        task.isExpiredEmailSent = true;
+        await taskRepository.updateTask(task._id, userId, task);
+
+        // Notify User
+        if (userEmail) {
+          await sendEmail({
+            email: userEmail,
+            subject: "Task Expired!",
+            message: `The deadline for "${task.title}" has passed. Please reassign time.`,
+            html: `<h3>Task Expired</h3><p>Your task <b>${task.title}</b> is overdue.</p>`
+          });
+        }
+
+        if (io) {
+          // Send to private user room
+          io.to(userId.toString()).emit("notification", { 
+            type: "EXPIRED", 
+            message: `Task "${task.title}" has expired.` 
+          });
+        }
+      }
+
+      // --- FLOW 2: AUTO-COMPLETE (Timer Check) ---
+      const activeTasks = await taskRepository.getAllRunningTasks();
+      if (activeTasks.length === 0 && expiredByDate.length === 0) return;
 
       for (const task of activeTasks) {
         const sessions = task.sessions;
@@ -18,36 +48,45 @@ const startTaskWatcher = (io) => {
         const lastSession = sessions[sessions.length - 1];
         if (!lastSession || !lastSession.startTime || lastSession.endTime) continue;
 
-        // 2. Calculate current total time including the live session
         const liveSessionMs = new Date().getTime() - new Date(lastSession.startTime).getTime();
-        const totalWorkedMs = (task.totalWorkedTime || 0) + liveSessionMs
-        const requiredMs = (task.required_time || 0) * 60 * 1000; //  change to mil seconds
+        const totalWorkedMs = (task.totalWorkedTime || 0) + liveSessionMs;
+        const requiredMs = (task.required_time || 0) * 60 * 1000;
 
-        // 3. The "Auto-Stop" Trigger
         if (totalWorkedMs >= requiredMs) {
-          console.log(`[WATCHER] Task ${task._id} hit limit. Auto-completing...`);
+          console.log(`[WATCHER] Task ${task._id} hit time limit.`);
           
+          const userId = task.createdBy._id;
+          const userEmail = task.createdBy.email;
+
           lastSession.endTime = new Date();
           task.totalWorkedTime = totalWorkedMs;
           task.isRunning = false;
           task.status = "completed";
 
-          // 4. Save the update to the Database
-          // Ensure your updateTask repository method handles the updated object correctly
-          const updatedTask = await taskRepository.updateTask(task._id, task.createdBy, task);
+          const updatedTask = await taskRepository.updateTask(task._id, userId, task);
 
-          // 5. THE REAL-TIME SIGNAL (Socket.io)
-          // Broadcast to anyone listening for this specific task ID
+          // Notify Completion
+          if (userEmail) {
+            await sendEmail({
+              email: userEmail,
+              subject: "Task Completed!",
+              message: `Congrats! You finished "${task.title}".`
+            });
+          }
+
           if (io) {
-            io.emit(`task_finished:${task._id}`, updatedTask);
-            console.log(`[WATCHER] Broadcast sent for task: ${task._id}`);
+            io.to(userId.toString()).emit(`task_finished:${task._id}`, updatedTask);
+            io.to(userId.toString()).emit("notification", { 
+                type: "SUCCESS", 
+                message: `Task "${task.title}" completed!` 
+            });
           }
         }
       }
     } catch (error) {
       console.error("Watcher Error:", error);
     }
-  }, 10000); 
+  }, 30000); // Check every 30 seconds
 };
 
 export default startTaskWatcher;

@@ -10,12 +10,16 @@ import taskRoutes from '../server/src/modules/tasks/routes/task.route.js'
 import userRoutes from '../server/src/modules/users/user.route.js'
 import startTaskWatcher from "./src/shared/utils/task.watcher.js"
 import path from 'path'
-
-// --- NEW IMPORTS FOR SOCKET.IO ---
 import http from "http";
 import { Server } from "socket.io";
+import helmet from 'helmet'
+import morgan from 'morgan'
+import compression from 'compression'
 
 const app = express()
+app.use(helmet())      // xss attacks
+app.use(morgan('dev'))  // logging
+app.use(compression()) // performance
 
 // 1. Create HTTP Server
 const server = http.createServer(app);
@@ -23,7 +27,7 @@ const server = http.createServer(app);
 // 2. Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Your Vite frontend URL
+    origin: "http://localhost:5173", 
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -31,14 +35,23 @@ const io = new Server(server, {
 
 // 3. Setup Connection Listener (For testing)
 io.on("connection", (socket) => {
-  console.log(`[SOCKET] User connected: ${socket.id}`);
+  // get users from handshake ( front end must send)
+   const userId = socket.handshake.query.userId;
+
+   if(userId){
+    socket.join(userId) // create private room for user
+    console.log(`[SOCKET] user ${userId} connected and join room`);
+   }
+   else {
+    console.log(`[SOCKET] Anonymous connection :${socket.id}`);
+   }
   
   socket.on("disconnect", () => {
     console.log("[SOCKET] User disconnected");
   });
 });
 
-// Make 'io' available to your routes or watchers if needed
+// Make 'io' available to your routes 
 app.set("io", io);
 
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
@@ -57,14 +70,14 @@ app.use('/api/tasks', taskRoutes)
 app.use('/api/users', userRoutes)
 app.use(errorHandler)
 
-connectDB()
+ await connectDB()
 
 // 4. Pass 'io' to your watcher so it can send signals!
 startTaskWatcher(io); 
 
 const PORT = process.env.PORT || 8000
 
-// 5. IMPORTANT: Use server.listen instead of app.listen
+
 server.listen(PORT, () => {
   console.log(`Server & Real-time Socket running on port ${PORT}`);
 });

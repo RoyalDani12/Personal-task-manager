@@ -12,17 +12,40 @@ import ProfilePage from "./pages/profilePage"
 import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
 
+import { SocketProvider } from "./context/Socket.Context"
+import { useState } from "react"
+import { useEffect } from "react"
+
 
 function App() {
+  
+   const [ user ,setUser ] = useState(null)
 
+   useEffect(()=>{
+        // check the user is logged in 
+
+        const savedUser = localStorage.getItem('user')
+        if(savedUser && savedUser !== "undefined"){
+         try {
+            const parsed = JSON.parse(savedUser);
+            const userData = parsed.user || parsed.data || parsed
+            setUser(userData)
+         } catch (error) {
+            console.error("Auth initialization failed",error)
+         }
+        }
+   },[])
 
   return (
      <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <SocketProvider userId ={user?._id}>
+
+      
       <BrowserRouter>
        <Routes>
           <Route path="/" element={<Home/>}></Route>
           <Route path="/register" element={<Register/>}></Route>
-          <Route path="/login" element={<Login/>}></Route>
+          <Route path="/login" element={<Login setUser={setUser}/>}></Route>
           <Route path="/dashboard" element={<Dashboard/>}></Route>
           <Route path="/task-detail/:id" element={<TaskDetail/>}></Route>
           <Route path="/create-task" element={<AddTask/>}></Route>
@@ -32,6 +55,7 @@ function App() {
           <Route path="/reset-pass" element={<ResetPassword/>}></Route>
        </Routes>
       </BrowserRouter>
+      </SocketProvider>
      </div>
   )
 }
