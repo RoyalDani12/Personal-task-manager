@@ -55,6 +55,8 @@ Deployed in **Cluster Mode** across 8 CPU instances to maximize hardware utiliza
 <p align="center">
 <img width="48%" alt="dashboard" src="https://github.com/user-attachments/assets/2b548689-45bf-40de-953a-aeaaf84b86d7" />
   <img src="https://github.com/user-attachments/assets/e64b12bf-5d7b-47cb-a0ce-b749cba6cda5" width="48%" />
+  <img width="48%" alt="add task" src="https://github.com/user-attachments/assets/74d043e9-dc98-497b-8cd5-fadc337ffd44" />
+  <img width="48%" alt="task deatil" src="https://github.com/user-attachments/assets/1b457992-36bd-4014-aee4-174fd45863ff" />
 </p>
 
 ### 📋 Task Management & Authentication
