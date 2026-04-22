@@ -12,7 +12,6 @@ import ProfilePage from "./pages/profilePage"
 import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
 
-import { SocketProvider } from "./context/Socket.Context"
 import { useState } from "react"
 import { useEffect } from "react"
 
@@ -38,7 +37,6 @@ function App() {
 
   return (
      <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <SocketProvider userId ={user?._id}>
 
       
       <BrowserRouter>
@@ -55,7 +53,6 @@ function App() {
           <Route path="/reset-pass" element={<ResetPassword/>}></Route>
        </Routes>
       </BrowserRouter>
-      </SocketProvider>
      </div>
   )
 }

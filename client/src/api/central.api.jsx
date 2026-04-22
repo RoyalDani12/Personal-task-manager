@@ -4,7 +4,7 @@ import axios from "axios";
 
 //  create axios instance
 const api = axios.create({
-  baseURL:"http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_URL + "/api",
   withCredentials:true 
 })
 
@@ -38,7 +38,7 @@ async(error)=>{
       
       // call refresh token
       const  res = await axios.post(
-         "http://localhost:5000/api/auth/refresh-token",
+         `${import.meta.env.VITE_API_URL}/api/auth/refresh-token`,
          {},
          { withCredentials :true }
       )

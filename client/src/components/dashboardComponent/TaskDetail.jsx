@@ -17,7 +17,6 @@ import Sidebar from "./Sidebar";
 import { formatDate, calculateTimeLeft } from "../../utils/time.utils";
 import { startTaskApi } from "../../api/start.task.api";
 import { stopTaskApi } from "../../api/stop.task.api";
-import { useSocket } from "../../context/Socket.Context";
 import { toast } from "react-toastify";
 
 const TaskDetail = () => {
@@ -29,29 +28,7 @@ const TaskDetail = () => {
   const [progress, setProgress] = useState(0);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
-  // socket io
-  const socket = useSocket()
 
-  useEffect(() => {
-    if (!socket || !id) return;
-
-    const eventName = `task_finished:${id}`;
-    socket.on(eventName, (updateTask) => {
-      console.log("server signal : Task auto-complete");
-      setTask(updateTask);
-      toast.success("Task completed Automatically")
-    }); 
-       //  global notification
-       socket.on("notification",(data)=>{
-             if(data.type === "EXPIRED"){
-              toast.error(data.message)
-             }
-       })
-    return () => {
-      socket.off(eventName);
-      socket.off("notification")
-    };
-  }, [socket,id]);
 
   const strokeDasharray = 565.48;
   const strokeDashoffset = strokeDasharray - (progress / 100) * strokeDasharray;
