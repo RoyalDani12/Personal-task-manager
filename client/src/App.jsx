@@ -8,7 +8,7 @@ import TaskDetail from "./components/dashboardComponent/TaskDetail"
 // import addTask from "./api/addTask"
 import AddTask from "./components/dashboardComponent/AddTask"
 import UpdateTask from "./components/dashboardComponent/UpdateTask"
-import ProfilePage from "./pages/profilePage"
+import ProfilePage from "./pages/ProfilePage"
 import ForgotPassword from "./pages/ForgotPassword"
 import ResetPassword from "./pages/ResetPassword"
 
