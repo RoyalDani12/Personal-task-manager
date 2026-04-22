@@ -6,8 +6,7 @@ export const resetPassUseCase = async (userRepository, password, token) => {
     error.statusCode = 400;
     throw error;
   }
-  // check the token expire or not
-  // find user by token
+  
    const  hashToken =  crypto.createHash('sha256').update(token).digest("hex")
   const user = await userRepository.findUserByResetToken(hashToken);
 
@@ -23,8 +22,7 @@ export const resetPassUseCase = async (userRepository, password, token) => {
     throw error;
   }
 
-  // if the token is not expire update the password filed
-  // has the password
+  
   const hashedPass =  await bcrypt.hash(password, 10);
   await userRepository.resetPasswordAndClearToken(hashToken, hashedPass);
 

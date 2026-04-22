@@ -16,7 +16,7 @@ import express from 'express'
 
 
 
- //login and register router
+ 
  router.post('/register',registerValidator,registerController)
  router.post('/login',loginValidator,loginController)
  router.post('/refresh-token',refreshController)

@@ -1,26 +1,31 @@
+const taskUseCase = async (taskRepository, createdBy, userData) => {
+  const {
+    title,
+    description,
+    status,
+    priority,
+    dueDate,
+    startedDate,
+    required_time,
+  } = userData;
 
-const taskUseCase =async(taskRepository,createdBy,userData)=>{
+  if (!title) {
+    const error = new Error("Title is required");
+    error.statusCode = 404;
+    throw error;
+  }
+  const createdTask = await taskRepository.createTask({
+    title,
+    description,
+    status,
+    priority,
+    createdBy,
+    dueDate,
+    startedDate,
+    required_time,
+  });
 
-   const { title,description,status,priority,dueDate,startedDate,required_time } = userData
+  return createdTask;
+};
 
-    if(!title){
-      const error = new Error("Title is required")
-      error.statusCode=404
-      throw error
-    }
-    const createdTask = await taskRepository.createTask({
-      title,
-      description,
-      status,
-      priority,
-      createdBy,
-      dueDate,
-      startedDate,
-      required_time
-    })
-
-    return createdTask
-
-}
-
-export default taskUseCase
+export default taskUseCase;

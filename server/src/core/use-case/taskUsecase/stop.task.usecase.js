@@ -18,7 +18,7 @@ export const stopTaskUseCase = async (taskId, userId, taskRepository) => {
 
   // 2. Identify and Close Session
   const lastSession = foundTask.sessions[foundTask.sessions.length - 1];
-  
+
   if (!lastSession || !lastSession.startTime) {
     throw new Error("No active session start time found");
   }
@@ -26,10 +26,12 @@ export const stopTaskUseCase = async (taskId, userId, taskRepository) => {
   lastSession.endTime = new Date();
 
   // 3. Precise Math
-  const sessionDuration = lastSession.endTime.getTime() - new Date(lastSession.startTime).getTime();
-  
+  const sessionDuration =
+    lastSession.endTime.getTime() - new Date(lastSession.startTime).getTime();
+
   // Ensure we are adding numbers, not undefined
-  foundTask.totalWorkedTime = (foundTask.totalWorkedTime || 0) + sessionDuration;
+  foundTask.totalWorkedTime =
+    (foundTask.totalWorkedTime || 0) + sessionDuration;
   foundTask.isRunning = false;
 
   // 4. THE COMPLETION CHECK (Add this!)
@@ -41,6 +43,10 @@ export const stopTaskUseCase = async (taskId, userId, taskRepository) => {
   }
 
   // 5. Final Save
-  const updatedTask = await taskRepository.updateTask(taskId, userId, foundTask);
+  const updatedTask = await taskRepository.updateTask(
+    taskId,
+    userId,
+    foundTask,
+  );
   return updatedTask;
 };

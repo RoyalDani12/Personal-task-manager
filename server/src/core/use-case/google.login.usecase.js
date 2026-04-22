@@ -6,12 +6,12 @@ const client =new  OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 const googleLoginUseCase=async(userRepository,body)=>{
 
-// console.log("Backend received body:", body);
+
 const token = body?.IdToken || body?.idToken || body?.token
   if(!token){
     throw new Error("Id token messing")
   }
-  // const { token } = body
+
 
 
   const verify = await client.verifyIdToken({

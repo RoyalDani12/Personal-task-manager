@@ -1,14 +1,11 @@
-
-const getTasksUseCase=async(id,taskRepository)=>{
-
-  if(!id){
-  throw new Error(" User Id required")
+const getTasksUseCase = async (id, taskRepository) => {
+  if (!id) {
+    throw new Error(" User Id required");
   }
-  
-  const tasks = await   taskRepository.getTasksByUser(id)
 
-  return tasks
+  const tasks = await taskRepository.getTasksByUser(id);
 
-}
+  return tasks;
+};
 
-export default getTasksUseCase
+export default getTasksUseCase;

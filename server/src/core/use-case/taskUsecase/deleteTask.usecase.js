@@ -1,17 +1,12 @@
-
-
-const  deleteTaskUseCase=async(taskId,userId,taskRepository)=>{
-
-  if(!userId){
-    throw new Error("Task Id is required")
-
+const deleteTaskUseCase = async (taskId, userId, taskRepository) => {
+  if (!userId) {
+    throw new Error("Task Id is required");
   }
   // check the task is owned by the user
-   
-  const deleteTask = await taskRepository.deleteTask(taskId,userId)
 
-  return deleteTask
-   
-}
+  const deleteTask = await taskRepository.deleteTask(taskId, userId);
 
-export default deleteTaskUseCase
+  return deleteTask;
+};
+
+export default deleteTaskUseCase;

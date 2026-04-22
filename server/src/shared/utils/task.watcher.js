@@ -4,7 +4,7 @@ import sendEmail from "../../infrastructure/services/email.service.js";
 const startTaskWatcher = (io) => {
   setInterval(async () => {
     try {
-      // --- FLOW 1: DEADLINE EXPIRATION (Calendar Check) ---
+      
       const expiredByDate = await taskRepository.getNewlyExpiredTasks();
       
       for (const task of expiredByDate) {
@@ -37,7 +37,7 @@ const startTaskWatcher = (io) => {
         }
       }
 
-      // --- FLOW 2: AUTO-COMPLETE (Timer Check) ---
+      
       const activeTasks = await taskRepository.getAllRunningTasks();
       if (activeTasks.length === 0 && expiredByDate.length === 0) return;
 
@@ -86,7 +86,7 @@ const startTaskWatcher = (io) => {
     } catch (error) {
       console.error("Watcher Error:", error);
     }
-  }, 30000); // Check every 30 seconds
+  }, 1000); 
 };
 
 export default startTaskWatcher;

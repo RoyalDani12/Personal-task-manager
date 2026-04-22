@@ -161,9 +161,9 @@ const TaskDetail = () => {
 
   if (loading)
     return (
-      <div className="h-screen bg-white flex items-center justify-center font-mono">
+      <div className="h-screen bg-white flex items-center flex-col justify-center font-mono">
         {" "}
-        <span className="animate-spin border-2 border-black border-t-transparent p-10 "></span>
+        <span className="animate-spin border-2 rounded-full  border-black border-t-transparent p-4 "></span>
         LOADING_SYSTEM...
       </div>
     );

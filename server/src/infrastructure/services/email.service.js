@@ -23,7 +23,7 @@ const sendEmail = async (options) => {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`Email successfully sent to ${options.email}  please check you email and reset your password`);
+    console.log(`Email successfully sent to ${options.email} `);
   } catch (error) {
     console.error("Nodemailer Error:", error.message);
     throw error;

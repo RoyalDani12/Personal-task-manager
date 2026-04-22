@@ -41,8 +41,6 @@ const registerSchema = Joi.object({
     }),
 }).options({
   abortEarly: true,
-  //  allowUnknown:false,
-  //  stripUnknown:true
 });
 
 export const registerValidator = (req, res, next) => {

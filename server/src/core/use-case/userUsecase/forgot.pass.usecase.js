@@ -1,5 +1,4 @@
 import crypto from "crypto"
-// import sendEmail from "../../../shared/utils/send.email.js"
 import sendEmail from "../../../infrastructure/services/email.service.js"
 export const forgotPassUseCase =async(userRepository,email)=>{
    const user = await userRepository.findUserByEmail(email)
@@ -30,7 +29,7 @@ const htmlContent = `<div>
     // email title
     subject: "Password Reset Request",
     html: htmlContent,
-    message: `Reset link: ${resetUrl}`, // Fallback
+    message: `Reset link: ${resetUrl}`,
   });
 
   return true; 

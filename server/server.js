@@ -27,15 +27,15 @@ const server = http.createServer(app);
 // 2. Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", 
+    origin: process.env.CLIENT_URL, 
     methods: ["GET", "POST"],
     credentials: true
   }
 });
 
-// 3. Setup Connection Listener (For testing)
+
 io.on("connection", (socket) => {
-  // get users from handshake ( front end must send)
+
    const userId = socket.handshake.query.userId;
 
    if(userId){
@@ -51,7 +51,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// Make 'io' available to your routes 
 app.set("io", io);
 
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
@@ -59,7 +58,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 //middleware 
 app.use(express.json())
 const corsOption = {
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
   credentials: true
 }
 app.use(cors(corsOption))
@@ -70,14 +69,22 @@ app.use('/api/tasks', taskRoutes)
 app.use('/api/users', userRoutes)
 app.use(errorHandler)
 
- await connectDB()
+const startServer = async () => {
+  try {
+    await connectDB();
 
-// 4. Pass 'io' to your watcher so it can send signals!
-startTaskWatcher(io); 
+    const PORT = process.env.PORT || 8000;
 
-const PORT = process.env.PORT || 8000
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
 
+    startTaskWatcher(io);
 
-server.listen(PORT, () => {
-  console.log(`Server & Real-time Socket running on port ${PORT}`);
-});
+  } catch (err) {
+    console.error("Server failed to start", err);
+    process.exit(1);
+  }
+};
+
+startServer();;

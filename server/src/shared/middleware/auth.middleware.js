@@ -19,7 +19,7 @@ const  authMiddleware =(roles =[])=>{
           req.user = decoded
 
         if(roles.length && !roles.includes(decoded.role)){
-          const error = new Error("Not authorized authrorization denide")
+          const error = new Error("Not authorized ? authorization dined")
           error.statusCode=403
           throw error
         }
