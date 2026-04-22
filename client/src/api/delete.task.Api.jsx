@@ -1,6 +1,6 @@
   
   
-  import api from "./api.Centeral";
+  import api from "./central.api";
 const deleteTask = async (id) => {
   try {
     

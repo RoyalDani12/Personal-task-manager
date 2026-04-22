@@ -1,4 +1,4 @@
-import api from "./api.Centeral";
+import api from "./central.api";
 
 const addTaskApi = async (taskData) => {
    try {

@@ -1,4 +1,4 @@
-import api from "./api.Centeral";
+import api from "./central.api";
 
 export const resetAPI = async (password,confirmPassword,token) => {
   try {

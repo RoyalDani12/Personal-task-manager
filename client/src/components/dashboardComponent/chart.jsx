@@ -5,19 +5,19 @@ const TaskDistributionChart = ({ completed, active, pending }) => {
   const total = completed + active + pending;
   
   const data = [
-    { name: 'Completed', value: completed, color: '#10B981' }, // Success Green (slightly softer)
-    { name: 'Active', value: active, color: '#F59E0B' },       // Warning Amber
-    { name: 'Pending', value: pending, color: '#6B7280' },     // Muted Gray
+    { name: 'Completed', value: completed, color: '#10B981' },
+    { name: 'Active', value: active, color: '#F59E0B' },
+    { name: 'Pending', value: pending, color: '#6B7280' },  
   ];
 
   return (
     <div className="bg-white border border-gray-300 rounded-2xl p-4 shadow-lg relative overflow-hidden group">
-      {/* Background Glow Effect */}
+      
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-yellow-200/5 blur-[100px] rounded-full"></div>
       
       <div className="flex flex-col md:flex-row items-center justify-between gap-8">
         
-        {/* Left Side: The Chart */}
+      
         <div className="relative w-full md:w-1/2 h-70">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
@@ -42,14 +42,13 @@ const TaskDistributionChart = ({ completed, active, pending }) => {
             </PieChart>
           </ResponsiveContainer>
           
-          {/* Center Text */}
+        
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <span className="text-gray-500 text-xs font-bold uppercase tracking-tighter">Total Tasks</span>
             <span className="text-4xl font-mono font-extrabold text-gray-900">{total.toString().padStart(2, '0')}</span>
           </div>
         </div>
 
-        {/* Right Side: Legend List */}
         <div className="w-full md:w-1/2 space-y-4">
           <h3 className="text-gray-900 font-bold text-lg mb-2">Performance Analytics</h3>
           {data.map((item, i) => (

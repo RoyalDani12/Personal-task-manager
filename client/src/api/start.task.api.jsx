@@ -1,4 +1,4 @@
-import api from "./api.Centeral";
+import api from "./central.api"
 
 
 export const startTaskApi = async(taskId)=>{

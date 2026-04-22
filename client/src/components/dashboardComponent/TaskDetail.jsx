@@ -20,8 +20,6 @@ import { stopTaskApi } from "../../api/stop.task.api";
 import { useSocket } from "../../context/Socket.Context";
 import { toast } from "react-toastify";
 
-// connect to the backend
-// const socket = io("http://localhost:5000", { withCredentials: true });
 const TaskDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();

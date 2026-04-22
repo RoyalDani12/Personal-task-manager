@@ -68,7 +68,6 @@ const AddTask = () => {
       console.log(ValidationError);
       return toast.error("please fix the highlighted errors.");
     }
-    // console.log(errors)
     try {
       await addTaskApi(payload);
       window.alert("Success: Task_Created");

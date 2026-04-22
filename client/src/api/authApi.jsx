@@ -1,22 +1,18 @@
-import axios from 'axios';
-import api from './api.Centeral';
+import axios from "axios";
+import api from "./central.api";
 
-const URL = 'http://localhost:5000/api/auth/register';
-
-// Create a function that takes data and returns the axios promise
 export const registerUserAPI = (userData) => {
-  // Use your central api instance instead of raw axios
-  return api.post('/auth/register', userData);
+  return api.post("/auth/register", userData);
 };
 
 export default registerUserAPI;
 
+
 export const loginAPI = async (data) => {
   try {
-    const response = await api.post('/auth/login', data);
-    return response; // Return the whole response object
+    const response = await api.post("/auth/login", data);
+    return response;
   } catch (error) {
-    // CRITICAL: Throw the error so the Frontend 'catch' block catches it
-    throw error; 
+    throw error;
   }
 };

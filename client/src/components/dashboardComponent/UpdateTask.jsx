@@ -15,17 +15,15 @@ const UpdateTask = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // State matches your Mongoose Model exactly
   const [taskData, setTaskData] = useState({
     title: "",
     description: "",
     priority: "medium",
-    difficultyLevel: "medium", // FIXED: Was 'difficulty'
-    startedDate: "", // FIXED: Was 'startDate'
+    difficultyLevel: "medium", 
+    startedDate: "",
     dueDate: "",
   });
 
-  // State for calculating the 'required_time' Number
   const [timeParts, setTimeParts] = useState({
     days: 0,
     hours: 0,
@@ -51,7 +49,7 @@ const UpdateTask = () => {
       return;
     }
 
-    // Calculate the 'required_time' your Model requires
+    
     const totalMinutes =
       timeParts.days * 1440 + timeParts.hours * 60 + timeParts.minutes;
 
@@ -61,7 +59,7 @@ const UpdateTask = () => {
     const payload = {
       ...taskData,
       dueDate: selectedDate.toISOString(),
-      required_time: totalMinutes, // FIXED: Now sending the required Number
+      required_time: totalMinutes, 
     };
 
     // validation

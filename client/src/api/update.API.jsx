@@ -1,20 +1,13 @@
-import api from "./api.Centeral"
 
+import api from "./central.api";
+const updateAPI = async (id, updatedData) => {
+  try {
+    const response = await api.put(`/tasks/update-task/${id}`, updatedData);
 
-const updateAPI =async(id,updatedData)=>{
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-  
-   try {
-
-
-    const response = await api.put(`/tasks/update-task/${id}`,updatedData)
-
-    return response
-
-   } catch (error) {
-    console.log(error)
-   }
-
-}
-
-export default updateAPI
+export default updateAPI;
