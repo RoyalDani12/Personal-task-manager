@@ -4,10 +4,10 @@ configDotenv()
 import errorHandler from "./src/shared/middleware/error.middleware.js"
 import cors from 'cors'
 import connectDB from "./src/infrastructure/database/mongodb/connection.js"
-import authRoutes from '../server/src/modules/auth/auth.route.js'
+import authRoutes from './src/modules/auth/auth.route.js'
 import cookieParser from "cookie-parser"
-import taskRoutes from '../server/src/modules/tasks/routes/task.route.js'
-import userRoutes from '../server/src/modules/users/user.route.js'
+import taskRoutes from './src/modules/tasks/routes/task.route.js'
+import userRoutes from './src/modules/users/user.route.js'
 import startTaskWatcher from "./src/shared/utils/task.watcher.js"
 import path from 'path'
 import http from "http";
